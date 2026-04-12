@@ -12,7 +12,7 @@ class Produit extends Model
     
     protected $fillable = [
         'id_produit', 'nom_produit', 'description_produit', 'prix_unitaire_produit',
-        'stock_disponible_produit', 'image_principale_produit', 'id_promo', 'id_categorie', 'id_entreprise'
+        'stock_disponible_produit', 'image_principale_produit', 'id_promo', 'id_categorie', 'boutique_id'
     ];
     
     public function promotion()
@@ -25,9 +25,9 @@ class Produit extends Model
         return $this->belongsTo(Categorie::class, 'id_categorie');
     }
     
-    public function entreprise()
+    public function boutique()
     {
-        return $this->belongsTo(Entreprise::class, 'id_entreprise');
+        return $this->belongsTo(Boutique::class, 'boutique_id');
     }
     
     public function prixAvecReduction()

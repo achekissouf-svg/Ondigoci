@@ -28,7 +28,47 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = auth()->user();
+        $paniers = \App\Models\Panier::where('user_id', $user->id)->get();
+
+        if ($paniers->isEmpty()) {
+            return redirect()->route('shop')->with('error', 'Votre panier est vide.');
+        }
+
+        // Calculate total
+        $total = 0;
+        foreach ($paniers as $item) {
+            $prix = $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit;
+            $total += ($prix * $item->quantite);
+        }
+
+        // Create Commande
+        $commande = Commande::create([
+            'id_commande' => \Illuminate\Support\Str::uuid(),
+            'num_commande' => 'CMD-' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'date_commande' => now(),
+            'montant_total_commande' => $total,
+            'statut_commande' => 'en_attente',
+            'id_mode_paiement' => 'MP001', // Cash by default
+            'user_id' => $user->id,
+            'telephone_commande' => $request->input('telephone_commande') ?? $user->telephone,
+        ]);
+
+        // Create LigneCommandes
+        foreach ($paniers as $item) {
+            \App\Models\LigneCommande::create([
+                'id_ligne_commande' => \Illuminate\Support\Str::uuid(),
+                'id_produit' => $item->id_produit,
+                'id_commande' => $commande->id_commande,
+                'quantite_ligne_commande' => $item->quantite,
+                'prix_au_moment_achat' => $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit,
+            ]);
+        }
+
+        // Empty Cart
+        \App\Models\Panier::where('user_id', $user->id)->delete();
+
+        return redirect()->route('home')->with('success', 'Votre commande a été passée avec succès !');
     }
 
     /**

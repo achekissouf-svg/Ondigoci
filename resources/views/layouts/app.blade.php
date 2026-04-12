@@ -267,16 +267,22 @@
                 </div>
                 
                 <div class="col-lg-3 col-md-4">
-                    <div class="auth-section justify-content-end">
+                    <div class="auth-section justify-content-end align-items-center">
                         @auth
-                            <i class="fas fa-user"></i>
+                            <a href="{{ route('cart.index') }}" class="position-relative me-4" style="color: #1e5a9e; font-size: 1.3rem; transition: color 0.3s;" onmouseover="this.style.color='#ff6b35'" onmouseout="this.style.color='#1e5a9e'">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                    {{ Auth::user()->paniers()->sum('quantite') ?: 0 }}
+                                </span>
+                            </a>
+                            <i class="fas fa-user ms-2"></i>
                             <span>{{ Auth::user()->name }}</span>
                         @else
                             <i class="fas fa-user"></i>
-                            <span>Account</span>
-                            <a href="{{ route('login') }}">Sign In</a>
+                            <span>Compte</span>
+                            <a href="{{ route('login') }}">Connexion</a>
                             <span>/</span>
-                            <a href="{{ route('register') }}">Register</a>
+                            <a href="{{ route('register') }}">Inscription</a>
                         @endauth
                     </div>
                 </div>
@@ -296,11 +302,11 @@
                         <a class="nav-link home-btn" href="{{ url('/') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('shop') }}">Shop All Products</a>
+                        <a class="nav-link" href="{{ route('shop') }}">Tous nos produits</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-                            Categories
+                            Catégories
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">Téléphones</a></li>
@@ -310,13 +316,13 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Flash Sales</a>
+                        <a class="nav-link" href="#">Ventes Flash</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Track Order</a>
+                        <a class="nav-link" href="#">Suivi de commande</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Help Center</a>
+                        <a class="nav-link" href="#">Centre d'aide</a>
                     </li>
                     @auth
                     <li class="nav-item dropdown ms-auto">
@@ -324,9 +330,32 @@
                             <i class="fas fa-user-circle"></i> Mon Compte
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Mon Profil</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-box"></i> Mes Commandes</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-shopping-cart"></i> Mon Panier</a></li>
+                            <li>
+                                @if(Auth::user()->role === 'admin')
+                                    <a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-pie text-primary"></i> Panneau Admin</a>
+                                @elseif(Auth::user()->role === 'boutique')
+                                    <a class="dropdown-item" href="{{ route('boutique.dashboard') }}"><i class="fas fa-store text-success"></i> Ma Boutique</a>
+                                @else
+                                    <a class="dropdown-item" href="{{ route('dashboard') }}"><i class="fas fa-desktop text-muted"></i> Mon Compte</a>
+                                    @if(!Auth::user()->boutique)
+                                        <a class="dropdown-item fw-bold text-primary" href="{{ route('boutique.register') }}"><i class="fas fa-plus-circle"></i> Ouvrir ma boutique</a>
+                                    @endif
+                                @endif
+                            </li>
+                            @if(Auth::user()->role === 'admin')
+                                <li><a class="dropdown-item" href="{{ route('admin.commandes.index') }}"><i class="fas fa-receipt text-primary"></i> Commandes reçues</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}"><i class="fas fa-users text-secondary"></i> Gérer les clients</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.boutiques.index') }}"><i class="fas fa-store text-warning"></i> Gérer les boutiques</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.produits.index') }}"><i class="fas fa-box text-success"></i> Mon Stock (Admin)</a></li>
+                            @elseif(Auth::user()->role === 'boutique')
+                                <li><a class="dropdown-item" href="{{ route('boutique.commandes.index') }}"><i class="fas fa-receipt text-primary"></i> Commandes reçues</a></li>
+                                <li><a class="dropdown-item" href="{{ route('boutique.produits.index') }}"><i class="fas fa-box text-success"></i> Gérer mes produits</a></li>
+                            @else
+                                {{-- Client uniquement --}}
+                                <li><a class="dropdown-item" href="{{ route('cart.index') }}"><i class="fas fa-shopping-cart text-primary"></i> Mon Panier</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-box text-secondary"></i> Mes Commandes</a></li>
+                            @endif
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user text-muted"></i> Mon Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">

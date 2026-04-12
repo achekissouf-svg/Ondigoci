@@ -20,6 +20,13 @@
             <x-text-input id="email" class="form-control mt-1" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
+ 
+        <!-- Telephone -->
+        <div class="mb-3">
+            <x-input-label for="telephone" :value="__('Numéro de téléphone')" />
+            <x-text-input id="telephone" class="form-control mt-1" type="text" name="telephone" :value="old('telephone')" required placeholder="ex: +225 0505..." />
+            <x-input-error :messages="$errors->get('telephone')" class="mt-2" />
+        </div>
 
         <!-- Password -->
         <div class="mb-3">

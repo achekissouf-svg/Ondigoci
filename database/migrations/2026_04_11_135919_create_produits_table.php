@@ -17,12 +17,11 @@ return new class extends Migration
             $table->string('image_principale_produit', 255);
             $table->string('id_promo', 50)->nullable();
             $table->string('id_categorie', 50);
-            $table->string('id_entreprise', 50);
+            $table->foreignId('boutique_id')->constrained('boutiques')->onDelete('cascade');
             $table->timestamps();
             
             $table->foreign('id_promo')->references('id_promo')->on('promotions')->onDelete('set null');
             $table->foreign('id_categorie')->references('id_categorie')->on('categories');
-            $table->foreign('id_entreprise')->references('id_entreprise')->on('entreprises');
         });
     }
 

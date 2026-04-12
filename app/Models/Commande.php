@@ -12,7 +12,7 @@ class Commande extends Model
     
     protected $fillable = [
         'id_commande', 'num_commande', 'date_commande', 'montant_total_commande',
-        'statut_commande', 'id_mode_paiement', 'user_id'
+        'statut_commande', 'id_mode_paiement', 'user_id', 'telephone_commande'
     ];
     
     protected $casts = [

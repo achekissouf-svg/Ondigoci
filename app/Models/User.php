@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'statut',
+        'telephone',
     ];
 
     /**
@@ -45,5 +48,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function boutique()
+    {
+        return $this->hasOne(Boutique::class);
+    }
+
+    public function paniers()
+    {
+        return $this->hasMany(Panier::class);
     }
 }

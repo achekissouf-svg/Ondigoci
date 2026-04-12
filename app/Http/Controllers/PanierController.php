@@ -45,7 +45,14 @@ class PanierController extends Controller
             ]);
         }
 
-        return response()->json(['success' => true, 'message' => 'Produit ajouté']);
+        // Return the current cart count so JS can update the badge
+        $cartCount = Panier::where('user_id', $user->id)->sum('quantite');
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Produit ajouté avec succès',
+            'cartCount' => $cartCount
+        ]);
     }
 
     /**
@@ -53,7 +60,15 @@ class PanierController extends Controller
      */
     public function index()
     {
-        //
+        $paniers = Panier::with('produit')->where('user_id', auth()->id())->get();
+        
+        $total = 0;
+        foreach ($paniers as $item) {
+            $prix = $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit;
+            $total += ($prix * $item->quantite);
+        }
+
+        return view('cart.index', compact('paniers', 'total'));
     }
 
     /**
@@ -91,16 +106,40 @@ class PanierController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Panier $panier)
+    public function update(Request $request, $id)
     {
-        //
+        $panier = Panier::where('id_panier', $id)
+                        ->where('user_id', auth()->id())
+                        ->firstOrFail();
+
+        $action = $request->input('action');
+
+        if ($action === 'increase') {
+            $panier->quantite += 1;
+        } elseif ($action === 'decrease') {
+            $panier->quantite -= 1;
+        }
+
+        if ($panier->quantite <= 0) {
+            $panier->delete();
+            return redirect()->route('cart.index')->with('success', 'Article retiré du panier.');
+        }
+
+        $panier->save();
+        return redirect()->route('cart.index')->with('success', 'Quantité mise à jour.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Panier $panier)
+    public function destroy($id)
     {
-        //
+        $panier = Panier::where('id_panier', $id)
+                        ->where('user_id', auth()->id())
+                        ->firstOrFail();
+                        
+        $panier->delete();
+
+        return redirect()->route('cart.index')->with('success', 'Produit retiré du panier.');
     }
 }

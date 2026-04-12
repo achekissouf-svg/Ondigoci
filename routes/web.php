@@ -4,6 +4,15 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\PanierController;
 use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\BoutiqueController as AdminBoutiqueController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ProduitController as AdminProduitController;
+use App\Http\Controllers\Admin\CommandeController as AdminCommandeController;
+use App\Http\Controllers\Boutique\DashboardController as BoutiqueDashboardController;
+use App\Http\Controllers\Boutique\ProduitController as BoutiqueProduitController;
+use App\Http\Controllers\Boutique\CommandeController as BoutiqueCommandeController;
+use App\Http\Controllers\BoutiqueRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil
@@ -19,8 +28,51 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add', [PanierController::class, 'add'])->name('cart.add');
     Route::get('/cart', [PanierController::class, 'index'])->name('cart.index');
+    Route::patch('/cart/{id}', [PanierController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{id}', [PanierController::class, 'destroy'])->name('cart.destroy');
     Route::post('/checkout', [CommandeController::class, 'store'])->name('checkout');
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Boutique Registration (for clients)
+    Route::get('/become-seller', [BoutiqueRegistrationController::class, 'create'])->name('boutique.register');
+    Route::post('/become-seller', [BoutiqueRegistrationController::class, 'store'])->name('boutique.register.store');
 });
+
+// Admin Routes
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    
+    // Manage Boutiques
+    Route::get('/boutiques', [AdminBoutiqueController::class, 'index'])->name('admin.boutiques.index');
+    Route::patch('/boutiques/{id}/approve', [AdminBoutiqueController::class, 'approve'])->name('admin.boutiques.approve');
+    Route::patch('/boutiques/{id}/reject', [AdminBoutiqueController::class, 'reject'])->name('admin.boutiques.reject');
+    Route::patch('/boutiques/{id}/block', [AdminBoutiqueController::class, 'block'])->name('admin.boutiques.block');
+    
+    // Manage Users
+    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::patch('/users/{id}/block', [AdminUserController::class, 'block'])->name('admin.users.block');
+    Route::patch('/users/{id}/unblock', [AdminUserController::class, 'unblock'])->name('admin.users.unblock');
+    
+    // Manage Produits (Stock Admin)
+    Route::resource('produits', AdminProduitController::class)->names('admin.produits');
+    
+    // Admin Commandes (orders for admin's products)
+    Route::get('/commandes', [AdminCommandeController::class, 'index'])->name('admin.commandes.index');
+    Route::patch('/commandes/{id}/status', [AdminCommandeController::class, 'update'])->name('admin.commandes.update');
+});
+
+// Boutique Routes (Vendeurs)
+Route::prefix('boutique')->middleware(['auth', 'boutique'])->group(function () {
+    Route::get('/dashboard', [BoutiqueDashboardController::class, 'index'])->name('boutique.dashboard');
+    // Boutique Produits CRUD
+    Route::resource('produits', BoutiqueProduitController::class)->names('boutique.produits');
+    // Boutique Commandes reçues
+    Route::get('/commandes', [BoutiqueCommandeController::class, 'index'])->name('boutique.commandes.index');
+    Route::patch('/commandes/{id}/status', [BoutiqueCommandeController::class, 'update'])->name('boutique.commandes.update');
+});
+
+Route::get('/boutique/pending', function () {
+    return view('boutique.pending');
+})->middleware('auth')->name('boutique.pending');
