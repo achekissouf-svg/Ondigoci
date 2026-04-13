@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produit;
+use App\Models\Categorie;
 use Illuminate\Http\Request;
 
 class ProduitController extends Controller
@@ -10,9 +11,31 @@ class ProduitController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = $request->input('q');
+        
+        // Get products with search
+        $produits = Produit::with(['categorie', 'boutique'])
+            ->whereHas('boutique', function($q) {
+                $q->where('statut', 'approuve');
+            });
+        
+        // Apply search filter if query exists
+        if ($query) {
+            $produits = $produits->where(function($q) use ($query) {
+                $q->where('nom_produit', 'LIKE', "%{$query}%")
+                  ->orWhere('description_produit', 'LIKE', "%{$query}%")
+                  ->orWhereHas('categorie', function($q2) use ($query) {
+                      $q2->where('libel_categorie', 'LIKE', "%{$query}%");
+                  });
+            });
+        }
+        
+        $produits = $produits->paginate(12);
+        $categories = Categorie::all();
+        
+        return view('shop', compact('produits', 'categories', 'query'));
     }
 
     /**

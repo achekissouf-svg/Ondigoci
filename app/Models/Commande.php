@@ -33,9 +33,19 @@ class Commande extends Model
     {
         return $this->hasMany(LigneCommande::class, 'id_commande');
     }
-    
+
+    public function lignes()
+    {
+        return $this->hasMany(LigneCommande::class, 'id_commande');
+    }
+
     public function livraison()
     {
         return $this->hasOne(Livraison::class, 'id_commande');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'id_commande', 'id_commande');
     }
 }

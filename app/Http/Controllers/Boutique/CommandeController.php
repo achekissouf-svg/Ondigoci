@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Boutique;
 use App\Http\Controllers\Controller;
 use App\Models\LigneCommande;
 use App\Models\Boutique;
+use App\Models\Commande;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class CommandeController extends Controller
@@ -31,19 +33,72 @@ class CommandeController extends Controller
 
     public function update(Request $request, $id)
     {
-        $commande = \App\Models\Commande::findOrFail($id);
+        $commande = Commande::findOrFail($id);
         
         // Potential check: ensure the order contains products from this boutique
         // For now, keeping it simple as per user request.
 
         $request->validate([
-            'statut_commande' => 'required|in:en_attente,en_cours,livre,annule',
+            'statut_commande' => 'required|in:en_attente,encours,livré,rejeté,annulé',
         ]);
 
-        $commande->update([
-            'statut_commande' => $request->statut_commande,
-        ]);
+        $oldStatus = $commande->statut_commande;
+        $newStatus = $request->statut_commande;
+
+        // Ne créer une notification que si le statut change réellement
+        if ($oldStatus !== $newStatus) {
+            $commande->update([
+                'statut_commande' => $newStatus,
+            ]);
+
+            // Créer une notification pour le client
+            $this->createStatusChangeNotification($commande, $oldStatus, $newStatus);
+        }
 
         return back()->with('success', 'Le statut de la commande a été mis à jour.');
     }
+
+    /**
+     * Crée une notification quand le statut change
+     */
+    private function createStatusChangeNotification(Commande $commande, string $oldStatus, string $newStatus)
+    {
+        $statusMessages = [
+            'en_attente' => [
+                'titre' => 'Commande en attente',
+                'message' => 'Votre commande a été reçue et est en attente de confirmation du vendeur.'
+            ],
+            'encours' => [
+                'titre' => 'Commande en cours de traitement',
+                'message' => 'Votre commande est en cours de traitement. Elle sera bientôt expédiée.'
+            ],
+            'livré' => [
+                'titre' => 'Commande livrée',
+                'message' => 'Félicitations! Votre commande a été livrée avec succès.'
+            ],
+            'rejeté' => [
+                'titre' => 'Commande rejetée',
+                'message' => 'Votre commande a été rejetée par le vendeur. Veuillez nous contacter pour plus d\'informations.'
+            ],
+            'annulé' => [
+                'titre' => 'Commande annulée',
+                'message' => 'Votre commande a été annulée.'
+            ]
+        ];
+
+        $notificationData = $statusMessages[$newStatus] ?? [
+            'titre' => 'Mise à jour de commande',
+            'message' => 'Votre commande a été mise à jour.'
+        ];
+
+        Notification::create([
+            'user_id' => $commande->user_id,
+            'id_commande' => $commande->id_commande,
+            'titre' => $notificationData['titre'],
+            'message' => $notificationData['message'],
+            'statut_commande' => $newStatus,
+            'lue' => false
+        ]);
+    }
 }
+

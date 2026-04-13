@@ -260,10 +260,10 @@
                 </div>
                 
                 <div class="col-lg-6 col-md-8">
-                    <div class="search-bar-container">
-                        <input type="text" placeholder="Rechercher des produits ou catégories...">
-                        <button><i class="fas fa-search"></i></button>
-                    </div>
+                    <form class="search-bar-container" id="searchForm" action="{{ route('shop') }}" method="GET" onsubmit="handleSearch(event)">
+                        <input type="text" id="searchInput" name="q" placeholder="Rechercher des produits ou catégories..." autocomplete="off">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
                 </div>
                 
                 <div class="col-lg-3 col-md-4">
@@ -316,11 +316,21 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Ventes Flash</a>
+                        <a class="nav-link" href="{{ route('shop') }}">Ventes Flash</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Suivi de commande</a>
+                        <a class="nav-link" href="@auth{{ route('client.commandes') }}@else#@endauth">Suivi de commande</a>
                     </li>
+                    @auth
+                        @if(Auth::user()->role === 'client')
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="{{ route('client.notifications') }}" id="notificationBell" title="Notifications" style="font-size: 1.2rem;">
+                                <i class="fas fa-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" id="notificationBadge" style="display: none; width: 12px; height: 12px;"></span>
+                            </a>
+                        </li>
+                        @endif
+                    @endauth
                     <li class="nav-item">
                         <a class="nav-link" href="#">Centre d'aide</a>
                     </li>
@@ -353,7 +363,7 @@
                             @else
                                 {{-- Client uniquement --}}
                                 <li><a class="dropdown-item" href="{{ route('cart.index') }}"><i class="fas fa-shopping-cart text-primary"></i> Mon Panier</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-box text-secondary"></i> Mes Commandes</a></li>
+                                <li><a class="dropdown-item" href="{{ route('client.commandes') }}"><i class="fas fa-box text-secondary"></i> Mes Commandes</a></li>
                             @endif
                             <li><a class="dropdown-item" href="#"><i class="fas fa-user text-muted"></i> Mon Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -434,6 +444,71 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Handle search form submission
+        function handleSearch(event) {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim();
+            
+            if (query === '') {
+                event.preventDefault();
+                alert('Veuillez entrer un terme de recherche');
+                return false;
+            }
+            
+            // Allow form submission with the search query
+            return true;
+        }
+
+        // Add event listeners for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            
+            // Focus and blur effects
+            searchInput.addEventListener('focus', function() {
+                this.style.borderColor = '#ff6b35';
+                this.style.boxShadow = '0 0 8px rgba(255, 107, 53, 0.3)';
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.style.borderColor = '#e0e0e0';
+                this.style.boxShadow = 'none';
+            });
+            
+            // Auto-submit on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchForm').submit();
+                }
+            });
+        });
+
+        // Charger les notifications automatiquement
+        @auth
+            @if(Auth::user()->role === 'client')
+            function loadNotifications() {
+                fetch('{{ route('client.notifications.data') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('notificationBadge');
+                        if (data.count > 0) {
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Erreur chargement notifications:', error));
+            }
+            
+            // Charger au démarrage
+            loadNotifications();
+            
+            // Rafraîchir toutes les 10 secondes
+            setInterval(loadNotifications, 10000);
+            @endif
+        @endauth
+    </script>
     
     @yield('scripts')
 </body>

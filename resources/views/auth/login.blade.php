@@ -1,30 +1,38 @@
-<x-guest-layout>
+@extends('layouts.auth')
+
+@section('content')
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">Connexion à Ondigoci</h2>
-        <p class="text-muted">Connectez-vous pour accéder à votre compte</p>
-    </div>
+    <h2>Connexion à Ondigoci</h2>
+    <p>Connectez-vous pour accéder à votre compte</p>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
         <div class="mb-3">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="form-control mt-1" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="form-label">
+                <i class="fas fa-envelope" style="color: #ff6b35; margin-right: 5px;"></i>{{ __('Email') }}
+            </label>
+            <input id="email" class="form-control" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="votre@email.com" />
+            @error('email')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
         </div>
 
         <!-- Password -->
         <div class="mb-3">
-            <x-input-label for="password" :value="__('Mot de passe')" />
-            <x-text-input id="password" class="form-control mt-1"
+            <label for="password" class="form-label">
+                <i class="fas fa-lock" style="color: #ff6b35; margin-right: 5px;"></i>{{ __('Mot de passe') }}
+            </label>
+            <input id="password" class="form-control"
                             type="password"
                             name="password"
-                            required autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            required autocomplete="current-password" placeholder="Votre mot de passe" />
+            @error('password')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
         </div>
 
         <!-- Remember Me -->
@@ -33,22 +41,22 @@
             <label for="remember_me" class="form-check-label">{{ __('Se souvenir de moi') }}</label>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center">
-            @if (Route::has('password.request'))
-                <a class="text-decoration-none" href="{{ route('password.request') }}">
-                    {{ __('Mot de passe oublié ?') }}
+        <button type="submit" class="btn btn-primary-ondigoci">
+            <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>{{ __('Se connecter') }}
+        </button>
+
+        @if (Route::has('password.request'))
+            <div class="text-center mt-3">
+                <a class="forgot-password-link" href="{{ route('password.request') }}">
+                    <i class="fas fa-question-circle"></i> {{ __('Mot de passe oublié ?') }}
                 </a>
-            @endif
+            </div>
+        @endif
 
-            <button type="submit" class="btn btn-primary">
-                {{ __('Se connecter') }}
-            </button>
-        </div>
-
-        <div class="text-center mt-4">
-            <p class="mb-0">Pas encore de compte ? 
-                <a href="{{ route('register') }}" class="text-decoration-none">Inscrivez-vous</a>
+        <div class="sign-up-section">
+            <p>Pas encore de compte ? 
+                <a href="{{ route('register') }}" class="sign-up-link">Inscrivez-vous</a>
             </p>
         </div>
     </form>
-</x-guest-layout>
+@endsection
