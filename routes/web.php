@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\PanierController;
 use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\ClientCommandeController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BoutiqueController as AdminBoutiqueController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -34,6 +35,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Client Commandes Routes
+    Route::get('/mes-commandes', [ClientCommandeController::class, 'index'])->name('client.commandes');
+    Route::get('/commande/{commande}', [ClientCommandeController::class, 'show'])->name('client.commandes.show');
+    Route::get('/suivi-commande/{commande}', [ClientCommandeController::class, 'tracking'])->name('client.commandes.tracking');
+    Route::get('/notifications', [ClientCommandeController::class, 'notificationsPage'])->name('client.notifications');
+    Route::get('/notifications-data', [ClientCommandeController::class, 'notifications'])->name('client.notifications.data');
+    Route::post('/notification/{notification}/mark-read', [ClientCommandeController::class, 'markNotificationAsRead'])->name('client.notification.mark-read');
 
     // Boutique Registration (for clients)
     Route::get('/become-seller', [BoutiqueRegistrationController::class, 'create'])->name('boutique.register');

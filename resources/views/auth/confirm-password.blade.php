@@ -1,27 +1,28 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
-    </div>
+@extends('layouts.auth')
+
+@section('content')
+    <h2>Confirmer le mot de passe</h2>
+    <p>Ceci est une zone sécurisée de l'application. Veuillez confirmer votre mot de passe avant de continuer.</p>
 
     <form method="POST" action="{{ route('password.confirm') }}">
         @csrf
 
         <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
+        <div class="mb-3">
+            <label for="password" class="form-label">
+                <i class="fas fa-lock" style="color: #ff6b35; margin-right: 5px;"></i>{{ __('Mot de passe') }}
+            </label>
+            <input id="password" class="form-control"
                             type="password"
                             name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            required autocomplete="current-password" placeholder="Votre mot de passe" />
+            @error('password')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="btn btn-primary-ondigoci">
+            <i class="fas fa-check" style="margin-right: 8px;"></i>{{ __('Confirmer') }}
+        </button>
     </form>
-</x-guest-layout>
+@endsection
