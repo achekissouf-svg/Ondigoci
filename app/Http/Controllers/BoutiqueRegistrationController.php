@@ -33,6 +33,7 @@ class BoutiqueRegistrationController extends Controller
             'nom_boutique' => 'required|string|max:100|unique:boutiques,nom_boutique',
             'description'  => 'required|string|max:500',
             'adresse_siege' => 'required|string|max:255',
+            'whatsapp' => 'nullable|string|max:20',
         ]);
 
         $user = Auth::user();
@@ -42,6 +43,7 @@ class BoutiqueRegistrationController extends Controller
             'nom_boutique' => $request->nom_boutique,
             'description' => $request->description,
             'adresse_siege' => $request->adresse_siege,
+            'whatsapp' => $request->whatsapp,
             'statut' => 'en_attente',
         ]);
 

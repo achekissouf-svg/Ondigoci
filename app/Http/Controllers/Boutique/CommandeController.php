@@ -39,7 +39,7 @@ class CommandeController extends Controller
         // For now, keeping it simple as per user request.
 
         $request->validate([
-            'statut_commande' => 'required|in:en_attente,encours,livré,rejeté,annulé',
+            'statut_commande' => 'required|in:en_attente,en_preparation,en_livraison,livree,rejetee,annulee',
         ]);
 
         $oldStatus = $commande->statut_commande;
@@ -66,21 +66,25 @@ class CommandeController extends Controller
         $statusMessages = [
             'en_attente' => [
                 'titre' => 'Commande en attente',
-                'message' => 'Votre commande a été reçue et est en attente de confirmation du vendeur.'
+                'message' => 'Votre commande a été reçue et est en attente de traitement.'
             ],
-            'encours' => [
-                'titre' => 'Commande en cours de traitement',
-                'message' => 'Votre commande est en cours de traitement. Elle sera bientôt expédiée.'
+            'en_preparation' => [
+                'titre' => 'Commande en préparation',
+                'message' => 'Le magasin prépare actuellement votre commande.'
             ],
-            'livré' => [
+            'en_livraison' => [
+                'titre' => 'Livraison à domicile',
+                'message' => 'Votre commande est en route pour la livraison à domicile.'
+            ],
+            'livree' => [
                 'titre' => 'Commande livrée',
-                'message' => 'Félicitations! Votre commande a été livrée avec succès.'
+                'message' => 'Félicitations ! Votre commande a été livrée avec succès.'
             ],
-            'rejeté' => [
+            'rejetee' => [
                 'titre' => 'Commande rejetée',
-                'message' => 'Votre commande a été rejetée par le vendeur. Veuillez nous contacter pour plus d\'informations.'
+                'message' => 'Votre commande a été rejetée par le vendeur.'
             ],
-            'annulé' => [
+            'annulee' => [
                 'titre' => 'Commande annulée',
                 'message' => 'Votre commande a été annulée.'
             ]

@@ -24,6 +24,7 @@
                         <th class="py-3 px-4">Boutique</th>
                         <th class="py-3 px-4">Propriétaire</th>
                         <th class="py-3 px-4">Adresse</th>
+                        <th class="py-3 px-4">Abonnement</th>
                         <th class="py-3 px-4 text-center">Statut</th>
                         <th class="py-3 px-4 text-center">Actions</th>
                     </tr>
@@ -40,6 +41,21 @@
                             <small class="text-muted">{{ $boutique->user->email }}</small>
                         </td>
                         <td class="px-4 text-muted small">{{ $boutique->adresse_siege }}</td>
+                        <td class="px-4">
+                            <form action="{{ route('admin.boutiques.plan', $boutique->id) }}" method="POST" class="row g-2">
+                                @csrf @method('PATCH')
+                                <div class="col-8">
+                                    <select name="type_abonnement" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="gratuit" {{ $boutique->type_abonnement == 'gratuit' ? 'selected' : '' }}>Gratuit</option>
+                                        <option value="standard" {{ $boutique->type_abonnement == 'standard' ? 'selected' : '' }}>Standard</option>
+                                        <option value="premium" {{ $boutique->type_abonnement == 'premium' ? 'selected' : '' }}>Premium</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <input type="number" name="priorite" class="form-control form-control-sm" value="{{ $boutique->priorite }}" title="Priorité" onchange="this.form.submit()">
+                                </div>
+                            </form>
+                        </td>
                         <td class="px-4 text-center">
                             @if($boutique->statut === 'approuve')
                                 <span class="badge bg-success">Actif</span>

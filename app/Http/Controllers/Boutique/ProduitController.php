@@ -33,8 +33,14 @@ class ProduitController extends Controller
             return redirect()->route('boutique.dashboard')
                              ->with('error', 'Vous devez avoir une boutique associée pour ajouter des produits.');
         }
+
+        if ($boutique->aAtteintLimiteProduits()) {
+            return redirect()->route('boutique.produits.index')
+                             ->with('error', 'Vous avez atteint votre limite de ' . $boutique->getMaxProduits() . ' produits. Veuillez vous réabonner pour continuer à publier.');
+        }
         $categories = Categorie::all();
-        return view('boutique.produits.create', compact('categories', 'boutique'));
+        $promotions = $boutique->promotions;
+        return view('boutique.produits.create', compact('categories', 'promotions', 'boutique'));
     }
 
     public function store(Request $request)
@@ -44,12 +50,22 @@ class ProduitController extends Controller
             return redirect()->route('boutique.dashboard')->with('error', 'Boutique introuvable.');
         }
 
+        if ($boutique->aAtteintLimiteProduits()) {
+            return redirect()->route('boutique.produits.index')
+                             ->with('error', 'Limite de produits atteinte. Veuillez vous réabonner pour ajouter de nouveaux articles.');
+        }
+
+        if ($boutique->aAtteintLimiteCategories($request->id_categorie)) {
+            return redirect()->route('boutique.produits.index')->with('error', 'Votre abonnement limite le nombre de catégories utilisables (' . $boutique->getMaxCategories() . ').');
+        }
+
         $request->validate([
             'nom_produit'              => 'required|string|max:150',
             'description_produit'      => 'required|string|max:255',
             'prix_unitaire_produit'    => 'required|numeric|min:0',
             'stock_disponible_produit' => 'required|integer|min:0',
             'id_categorie'             => 'required|string|exists:categories,id_categorie',
+            'id_promo'                 => 'nullable|string|exists:promotions,id_promo',
             'image'                    => 'nullable|image|max:2048',
         ]);
 
@@ -67,6 +83,7 @@ class ProduitController extends Controller
             'stock_disponible_produit' => $request->stock_disponible_produit,
             'image_principale_produit' => $imageName,
             'id_categorie'             => $request->id_categorie,
+            'id_promo'                 => $request->id_promo,
             'boutique_id'              => $boutique->id,
         ]);
 
@@ -81,7 +98,8 @@ class ProduitController extends Controller
                           ->where('boutique_id', $boutique?->id)
                           ->firstOrFail();
         $categories = Categorie::all();
-        return view('boutique.produits.edit', compact('produit', 'categories', 'boutique'));
+        $promotions = $boutique->promotions;
+        return view('boutique.produits.edit', compact('produit', 'categories', 'promotions', 'boutique'));
     }
 
     public function update(Request $request, string $id)
@@ -97,8 +115,13 @@ class ProduitController extends Controller
             'prix_unitaire_produit'    => 'required|numeric|min:0',
             'stock_disponible_produit' => 'required|integer|min:0',
             'id_categorie'             => 'required|string|exists:categories,id_categorie',
+            'id_promo'                 => 'nullable|string|exists:promotions,id_promo',
             'image'                    => 'nullable|image|max:2048',
         ]);
+
+        if ($boutique->aAtteintLimiteCategories($request->id_categorie)) {
+            return redirect()->route('boutique.produits.index')->with('error', 'Limite de catégories atteinte pour votre abonnement.');
+        }
 
         if ($request->hasFile('image')) {
             $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
@@ -112,6 +135,7 @@ class ProduitController extends Controller
             'prix_unitaire_produit'    => $request->prix_unitaire_produit,
             'stock_disponible_produit' => $request->stock_disponible_produit,
             'id_categorie'             => $request->id_categorie,
+            'id_promo'                 => $request->id_promo,
         ]);
 
         return redirect()->route('boutique.produits.index')

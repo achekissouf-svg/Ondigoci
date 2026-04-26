@@ -27,14 +27,16 @@
             @foreach($featuredProducts as $product)
             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                 <div class="card h-100 shadow-sm" style="border: none; border-radius: 12px; overflow: hidden; cursor: pointer;">
-                    <div class="card-img-top" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 15px;">
+                    <a href="{{ route('produit.show', $product->id_produit) }}" class="card-img-top" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none;">
                         <img src="{{ asset('images/' . $product->image_principale_produit) }}" 
                              alt="{{ $product->nom_produit }}"
                              style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </div>
+                    </a>
                         <div class="card-body text-center">
                             <h6 class="card-title fw-semibold mb-2" style="font-size: 0.95rem; min-height: 45px; color: #333;">
-                                {{ $product->nom_produit }}
+                                <a href="{{ route('produit.show', $product->id_produit) }}" class="text-decoration-none text-dark">
+                                    {{ $product->nom_produit }}
+                                </a>
                             </h6>
                             <p class="card-text fw-bold mb-3" style="font-size: 1.1rem; color: #1e5a9e;">
                                 {{ number_format($product->prix_unitaire_produit, 0, ',', ' ') }} FCFA

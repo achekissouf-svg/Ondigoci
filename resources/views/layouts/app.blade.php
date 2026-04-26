@@ -309,10 +309,13 @@
                             Catégories
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Téléphones</a></li>
-                            <li><a class="dropdown-item" href="#">Ordinateurs</a></li>
-                            <li><a class="dropdown-item" href="#">Accessoires</a></li>
-                            <li><a class="dropdown-item" href="#">Électronique</a></li>
+                            @if(isset($layoutCategories))
+                                @foreach($layoutCategories as $cat)
+                                    <li><a class="dropdown-item" href="{{ route('shop', ['q' => $cat->libel_categorie]) }}">{{ $cat->libel_categorie }}</a></li>
+                                @endforeach
+                            @else
+                                <li><a class="dropdown-item" href="#">Aucune catégorie</a></li>
+                            @endif
                         </ul>
                     </li>
                     <li class="nav-item">

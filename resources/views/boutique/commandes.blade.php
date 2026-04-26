@@ -62,7 +62,8 @@
                                     <div>
                                         <p class="mb-0 fw-semibold">{{ $ligne->commande->user->name ?? '—' }}</p>
                                         <small class="text-muted"><i class="fas fa-envelope me-1"></i> {{ $ligne->commande->user->email ?? '' }}</small><br>
-                                        <small class="fw-bold text-success"><i class="fas fa-phone me-1"></i> {{ $ligne->commande->telephone_commande ?? ($ligne->commande->user->telephone ?? 'N/A') }}</small>
+                                        <small class="fw-bold text-success"><i class="fas fa-phone me-1"></i> {{ $ligne->commande->telephone_commande ?? ($ligne->commande->user->telephone ?? 'N/A') }}</small><br>
+                                        <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i> {{ $ligne->commande->livraison->adresse_livraison ?? 'Non spécifiée' }}</small>
                                     </div>
                                 </td>
                                 <td class="px-4 text-center">
@@ -80,30 +81,47 @@
                                     <div class="dropdown">
                                         @php $statut = $ligne->commande->statut_commande ?? 'en_attente'; @endphp
                                         <button class="btn btn-sm dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" 
-                                                style="border-radius: 20px; @if($statut === 'livre') background: #d1e7dd; color: #0f5132; @elseif($statut === 'en_cours') background: #cff4fc; color: #055160; @elseif($statut === 'annule') background: #f8d7da; color: #842029; @else background: #fff3cd; color: #664d03; @endif">
-                                            @if($statut === 'livre') Livré @elseif($statut === 'en_cours') En cours @elseif($statut === 'annule') Annulé @else En attente @endif
+                                                style="border-radius: 20px; 
+                                                @if($statut === 'livree') background: #d1e7dd; color: #0f5132; 
+                                                @elseif($statut === 'en_livraison') background: #cff4fc; color: #055160; 
+                                                @elseif($statut === 'en_preparation') background: #cfe2ff; color: #084298; 
+                                                @elseif($statut === 'annulee' || $statut === 'rejetee') background: #f8d7da; color: #842029; 
+                                                @else background: #fff3cd; color: #664d03; @endif">
+                                            @if($statut === 'livree') Livrée 
+                                            @elseif($statut === 'en_livraison') En livraison 
+                                            @elseif($statut === 'en_preparation') En préparation 
+                                            @elseif($statut === 'annulee') Annulée 
+                                            @elseif($statut === 'rejetee') Rejetée 
+                                            @else En attente @endif
                                         </button>
                                         <ul class="dropdown-menu shadow border-0">
                                             <li>
                                                 <form action="{{ route('boutique.commandes.update', $ligne->commande->id_commande) }}" method="POST">
                                                     @csrf @method('PATCH')
-                                                    <input type="hidden" name="statut_commande" value="en_cours">
-                                                    <button type="submit" class="dropdown-item text-info"><i class="fas fa-play-circle me-2"></i> Valider (En cours)</button>
+                                                    <input type="hidden" name="statut_commande" value="en_preparation">
+                                                    <button type="submit" class="dropdown-item text-primary"><i class="fas fa-box-open me-2"></i> Préparer (En préparation)</button>
                                                 </form>
                                             </li>
                                             <li>
                                                 <form action="{{ route('boutique.commandes.update', $ligne->commande->id_commande) }}" method="POST">
                                                     @csrf @method('PATCH')
-                                                    <input type="hidden" name="statut_commande" value="livre">
-                                                    <button type="submit" class="dropdown-item text-success"><i class="fas fa-check-double me-2"></i> Terminer (Livré)</button>
+                                                    <input type="hidden" name="statut_commande" value="en_livraison">
+                                                    <button type="submit" class="dropdown-item text-info"><i class="fas fa-truck me-2"></i> Expédier (En livraison)</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('boutique.commandes.update', $ligne->commande->id_commande) }}" method="POST">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="statut_commande" value="livree">
+                                                    <button type="submit" class="dropdown-item text-success"><i class="fas fa-check-double me-2"></i> Terminer (Livrée)</button>
                                                 </form>
                                             </li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
                                                 <form action="{{ route('boutique.commandes.update', $ligne->commande->id_commande) }}" method="POST">
                                                     @csrf @method('PATCH')
-                                                    <input type="hidden" name="statut_commande" value="annule">
-                                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-times-circle me-2"></i> Rejeter (Annulé)</button>
+                                                    <input type="hidden" name="statut_commande" value="rejetee">
+                                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-times-circle me-2"></i> Rejeter (Rejetée)</button>
                                                 </form>
                                             </li>
                                         </ul>

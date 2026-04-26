@@ -42,4 +42,21 @@ class BoutiqueController extends Controller
 
         return redirect()->back()->with('success', 'La boutique "' . $boutique->nom_boutique . '" a été bloquée.');
     }
+
+    public function updatePlan(Request $request, $id)
+    {
+        $boutique = Boutique::findOrFail($id);
+        
+        $request->validate([
+            'type_abonnement' => 'required|in:gratuit,standard,premium',
+            'priorite'        => 'required|integer|min:0',
+        ]);
+
+        $boutique->update([
+            'type_abonnement' => $request->type_abonnement,
+            'priorite'        => $request->priorite,
+        ]);
+
+        return redirect()->back()->with('success', 'Abonnement de "' . $boutique->nom_boutique . '" mis à jour !');
+    }
 }

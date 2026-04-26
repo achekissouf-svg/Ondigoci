@@ -33,11 +33,13 @@
                             <div class="card h-100" style="border: none; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s;">
                                 <!-- Product Image -->
                                 <div style="background: #f5f5f5; height: 250px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                                    @if($produit->image_principale_produit)
-                                        <img src="{{ asset('images/' . $produit->image_principale_produit) }}" alt="{{ $produit->nom_produit }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                    @else
-                                        <i class="fas fa-image" style="font-size: 60px; color: #ddd;"></i>
-                                    @endif
+                                    <a href="{{ route('produit.show', $produit->id_produit) }}" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                        @if($produit->image_principale_produit)
+                                            <img src="{{ asset('images/' . $produit->image_principale_produit) }}" alt="{{ $produit->nom_produit }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <i class="fas fa-image" style="font-size: 60px; color: #ddd;"></i>
+                                        @endif
+                                    </a>
                                     
                                     <!-- Badge -->
                                     @if($produit->promotion && $produit->promotion->date_debut_promo <= now() && $produit->promotion->date_fin_promo >= now())
@@ -55,9 +57,11 @@
                                     </small>
 
                                     <!-- Product Name -->
-                                    <h5 class="card-title mt-2 mb-2" style="color: #1e5a9e; font-size: 16px; font-weight: 600;">
-                                        {{ Str::limit($produit->nom_produit, 50) }}
-                                    </h5>
+                                    <a href="{{ route('produit.show', $produit->id_produit) }}" style="text-decoration: none;">
+                                        <h5 class="card-title mt-2 mb-2" style="color: #1e5a9e; font-size: 16px; font-weight: 600;">
+                                            {{ Str::limit($produit->nom_produit, 50) }}
+                                        </h5>
+                                    </a>
 
                                     <!-- Description -->
                                     <p class="card-text text-muted" style="font-size: 13px; margin-bottom: 10px;">

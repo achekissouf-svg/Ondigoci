@@ -50,15 +50,34 @@
                                 @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label fw-semibold">Promotion</label>
+                                <select name="id_promo" class="form-select @error('id_promo') is-invalid @enderror">
+                                    <option value="">-- Aucune promotion --</option>
+                                    @foreach($promotions as $promo)
+                                        <option value="{{ $promo->id_promo }}" {{ old('id_promo') == $promo->id_promo ? 'selected' : '' }}>
+                                            {{ $promo->nom_promo }} (-{{ $promo->pourcentage_reduction }}%)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_promo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label fw-semibold">Image du produit</label>
                                 <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
                                 @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="d-flex gap-3 mt-5">
-                            <button type="submit" class="btn fw-bold text-white px-5" style="background: #1e5a9e; border-radius: 8px;">
-                                <i class="fas fa-save me-2"></i> Publier le produit
-                            </button>
+                            @if($boutique->aAtteintLimiteProduits())
+                                <button type="button" class="btn fw-bold text-white px-5 opacity-50" style="background: #ff6b35; border-radius: 8px;" disabled>
+                                    <i class="fas fa-exclamation-circle me-2"></i> Limite atteinte
+                                </button>
+                                <p class="text-danger small mb-0 align-self-center">Veuillez vous réabonner pour publier.</p>
+                            @else
+                                <button type="submit" class="btn fw-bold text-white px-5" style="background: #1e5a9e; border-radius: 8px;">
+                                    <i class="fas fa-save me-2"></i> Publier le produit
+                                </button>
+                            @endif
                             <a href="{{ route('boutique.produits.index') }}" class="btn btn-outline-secondary px-4" style="border-radius: 8px;">Annuler</a>
                         </div>
                     </form>

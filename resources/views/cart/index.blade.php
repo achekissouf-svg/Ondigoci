@@ -107,13 +107,41 @@
                         
                         <form action="{{ route('checkout') }}" method="POST">
                             @csrf
+                            <div class="mb-3">
+                                <label for="adresse_livraison" class="form-label fw-bold text-muted small text-uppercase">Adresse de livraison à domicile</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                                    <input type="text" name="adresse_livraison" id="adresse_livraison" class="form-control border-start-0 ps-0" placeholder="Ex: Douala, Akwa face immeuble X" required>
+                                </div>
+                            </div>
+                            
                             <div class="mb-4">
-                                <label for="telephone_commande" class="form-label fw-bold text-muted small uppercase">Numéro de contact pour livraison</label>
+                                <label for="telephone_commande" class="form-label fw-bold text-muted small text-uppercase">Numéro de contact pour livraison</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-end-0"><i class="fas fa-phone text-muted"></i></span>
-                                    <input type="text" name="telephone_commande" id="telephone_commande" class="form-control border-start-0 ps-0" value="{{ auth()->user()->telephone }}" placeholder="Numéro joignable pour la livraison">
+                                    <input type="text" name="telephone_commande" id="telephone_commande" class="form-control border-start-0 ps-0" value="{{ auth()->user()->telephone }}" placeholder="Numéro joignable pour la livraison" required>
                                 </div>
                                 <small class="text-muted">Par défaut, nous utiliserons le numéro de votre compte.</small>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="fw-bold mb-3">Moyen de paiement</h5>
+                            <div class="mb-4">
+                                @foreach($modesPaiement as $mode)
+                                    <div class="form-check custom-radio border rounded p-3 mb-2 d-flex align-items-center" style="cursor: pointer; transition: background 0.2s;" onclick="document.getElementById('mode_{{ $mode->id_mode_paiement }}').checked = true;">
+                                        <input class="form-check-input mt-0 me-3" type="radio" name="id_mode_paiement" id="mode_{{ $mode->id_mode_paiement }}" value="{{ $mode->id_mode_paiement }}" required {{ $loop->first ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold flex-grow-1 mb-0" for="mode_{{ $mode->id_mode_paiement }}" style="cursor: pointer;">
+                                            {{ $mode->libel_mode_paiement }}
+                                        </label>
+                                        @if($mode->id_mode_paiement === 'MP_MOBILE')
+                                            <i class="fas fa-mobile-alt text-warning fs-4"></i>
+                                        @elseif($mode->id_mode_paiement === 'MP_LIVRAISON')
+                                            <i class="fas fa-truck text-info fs-4"></i>
+                                        @elseif($mode->id_mode_paiement === 'MP_PLACE')
+                                            <i class="fas fa-store text-success fs-4"></i>
+                                        @endif
+                                    </div>
+                                @endforeach
                             </div>
 
                             <button type="submit" class="btn btn-lg w-100 py-3 fw-bold shadow-sm mb-3 text-white" style="background: #ff6b35; border-radius: 8px; transition: background 0.3s;" onmouseover="this.style.background='#e55a28'" onmouseout="this.style.background='#ff6b35'">
