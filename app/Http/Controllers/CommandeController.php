@@ -31,6 +31,12 @@ class CommandeController extends Controller
         $user = auth()->user();
         $paniers = \App\Models\Panier::where('user_id', $user->id)->get();
 
+        $request->validate([
+            'adresse_livraison' => 'required|string|max:255',
+            'telephone_commande' => 'required|string|max:50',
+            'id_mode_paiement' => 'required|exists:mode_paiements,id_mode_paiement',
+        ]);
+
         if ($paniers->isEmpty()) {
             return redirect()->route('shop')->with('error', 'Votre panier est vide.');
         }
@@ -49,7 +55,7 @@ class CommandeController extends Controller
             'date_commande' => now(),
             'montant_total_commande' => $total,
             'statut_commande' => 'en_attente',
-            'id_mode_paiement' => 'MP001', // Cash by default
+            'id_mode_paiement' => $request->id_mode_paiement,
             'user_id' => $user->id,
             'telephone_commande' => $request->input('telephone_commande') ?? $user->telephone,
         ]);
@@ -64,6 +70,16 @@ class CommandeController extends Controller
                 'prix_au_moment_achat' => $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit,
             ]);
         }
+
+        // Create Livraison record
+        \App\Models\Livraison::create([
+            'id_livraison' => \Illuminate\Support\Str::uuid(),
+            'id_commande' => $commande->id_commande,
+            'adresse_livraison' => $request->adresse_livraison,
+            'date_estimee' => now()->addDays(2), // Estimated delivery
+            'frais_livraison' => 0, // Set to 0 or calculate
+            'statut_livraison' => 'en_attente',
+        ]);
 
         // Empty Cart
         \App\Models\Panier::where('user_id', $user->id)->delete();

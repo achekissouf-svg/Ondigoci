@@ -14,15 +14,35 @@
             </p>
         </div>
         @if($boutique)
-        <a href="{{ route('boutique.produits.create') }}" class="btn fw-bold text-white shadow-sm" style="background: #ff6b35; border-radius: 8px;">
-            <i class="fas fa-plus me-2"></i> Ajouter un produit
-        </a>
+            @if($boutique->aAtteintLimiteProduits())
+                <button class="btn fw-bold text-white shadow-sm opacity-50" style="background: #ff6b35; border-radius: 8px;" title="Limite atteinte" disabled>
+                    <i class="fas fa-plus me-2"></i> Ajouter un produit
+                </button>
+            @else
+                <a href="{{ route('boutique.produits.create') }}" class="btn fw-bold text-white shadow-sm" style="background: #ff6b35; border-radius: 8px;">
+                    <i class="fas fa-plus me-2"></i> Ajouter un produit
+                </a>
+            @endif
         @endif
     </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm" style="border-left: 5px solid #28a745;">
             <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if($boutique && $boutique->aAtteintLimiteProduits())
+        <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-4" style="border-left: 5px solid #ffc107; background-color: #fff8e1;">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-3 fa-2x text-warning"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">Limite de produits atteinte !</h5>
+                    <p class="mb-0">Vous avez publié <strong>{{ $boutique->produits()->count() }}</strong> produits sur <strong>{{ $boutique->getMaxProduits() }}</strong> autorisés. <br>
+                    <span class="fw-bold" style="color: #d32f2f;">Veuillez vous réabonner pour continuer à ajouter de nouveaux articles et booster votre visibilité.</span></p>
+                </div>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -65,9 +85,15 @@
         <h4 class="fw-bold">Aucun produit pour le moment</h4>
         <p class="text-muted">Ajoutez votre premier produit pour qu'il soit visible par les clients.</p>
         @if($boutique)
-        <a href="{{ route('boutique.produits.create') }}" class="btn text-white fw-bold px-4" style="background: #ff6b35; border-radius: 8px;">
-            <i class="fas fa-plus me-2"></i> Ajouter un produit
-        </a>
+            @if($boutique->aAtteintLimiteProduits())
+                <button class="btn text-white fw-bold px-4 opacity-50" style="background: #ff6b35; border-radius: 8px;" disabled>
+                    <i class="fas fa-plus me-2"></i> Ajouter un produit (Limite atteinte)
+                </button>
+            @else
+                <a href="{{ route('boutique.produits.create') }}" class="btn text-white fw-bold px-4" style="background: #ff6b35; border-radius: 8px;">
+                    <i class="fas fa-plus me-2"></i> Ajouter un produit
+                </a>
+            @endif
         @endif
     </div>
     @endif

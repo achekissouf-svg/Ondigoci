@@ -11,7 +11,7 @@ class Promotion extends Model
     protected $keyType = 'string';
     
     protected $fillable = [
-        'id_promo', 'nom_promo', 'pourcentage_reduction', 'date_debut_promo', 'date_fin_promo'
+        'id_promo', 'nom_promo', 'pourcentage_reduction', 'date_debut_promo', 'date_fin_promo', 'boutique_id'
     ];
     
     protected $casts = [
@@ -22,5 +22,10 @@ class Promotion extends Model
     public function produits()
     {
         return $this->hasMany(Produit::class, 'id_promo');
+    }
+
+    public function boutique()
+    {
+        return $this->belongsTo(Boutique::class, 'boutique_id');
     }
 }

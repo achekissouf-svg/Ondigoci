@@ -68,7 +68,9 @@ class PanierController extends Controller
             $total += ($prix * $item->quantite);
         }
 
-        return view('cart.index', compact('paniers', 'total'));
+        $modesPaiement = \App\Models\ModePaiement::all();
+
+        return view('cart.index', compact('paniers', 'total', 'modesPaiement'));
     }
 
     /**

@@ -40,6 +40,14 @@
                             @error('adresse_siege')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Numéro WhatsApp de contact</label>
+                            <input type="text" name="whatsapp" class="form-control @error('whatsapp') is-invalid @enderror" 
+                                   placeholder="Ex: +237612345678" value="{{ old('whatsapp') }}">
+                            @error('whatsapp')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <div class="form-text">Ce numéro sera affiché sur la page de votre magasin pour que les clients vous contactent.</div>
+                        </div>
+
                         <div class="d-grid mt-5">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm" style="border-radius: 12px; background: #1e5a9e;">
                                 Soumettre ma demande de création

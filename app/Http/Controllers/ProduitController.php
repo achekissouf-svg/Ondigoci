@@ -17,9 +17,9 @@ class ProduitController extends Controller
         
         // Get products with search
         $produits = Produit::with(['categorie', 'boutique'])
-            ->whereHas('boutique', function($q) {
-                $q->where('statut', 'approuve');
-            });
+            ->join('boutiques', 'produits.boutique_id', '=', 'boutiques.id')
+            ->where('boutiques.statut', 'approuve')
+            ->select('produits.*');
         
         // Apply search filter if query exists
         if ($query) {
@@ -32,7 +32,9 @@ class ProduitController extends Controller
             });
         }
         
-        $produits = $produits->paginate(12);
+        $produits = $produits->orderByDesc('boutiques.priorite')
+                             ->orderByDesc('produits.created_at')
+                             ->paginate(12);
         $categories = Categorie::all();
         
         return view('shop', compact('produits', 'categories', 'query'));
@@ -57,9 +59,20 @@ class ProduitController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Produit $produit)
+    public function show($id)
     {
-        //
+        $produit = Produit::with(['categorie', 'boutique'])->where('id_produit', $id)->firstOrFail();
+        
+        // Suggest other products from the same boutique or category
+        $suggestions = Produit::where('id_categorie', $produit->id_categorie)
+            ->where('id_produit', '!=', $id)
+            ->whereHas('boutique', function($q) {
+                $q->where('statut', 'approuve');
+            })
+            ->limit(4)
+            ->get();
+
+        return view('produit_show', compact('produit', 'suggestions'));
     }
 
     /**

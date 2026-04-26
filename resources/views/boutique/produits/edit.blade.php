@@ -48,6 +48,18 @@
                                 @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label fw-semibold">Promotion</label>
+                                <select name="id_promo" class="form-select @error('id_promo') is-invalid @enderror">
+                                    <option value="">-- Aucune promotion --</option>
+                                    @foreach($promotions as $promo)
+                                        <option value="{{ $promo->id_promo }}" {{ old('id_promo', $produit->id_promo) == $promo->id_promo ? 'selected' : '' }}>
+                                            {{ $promo->nom_promo }} (-{{ $promo->pourcentage_reduction }}%)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_promo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label fw-semibold">Nouvelle image (optionnel)</label>
                                 @if($produit->image_principale_produit)
                                     <div class="mb-2">
