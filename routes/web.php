@@ -15,8 +15,14 @@ use App\Http\Controllers\Boutique\DashboardController as BoutiqueDashboardContro
 use App\Http\Controllers\Boutique\ProduitController as BoutiqueProduitController;
 use App\Http\Controllers\Boutique\CommandeController as BoutiqueCommandeController;
 use App\Http\Controllers\Boutique\PromotionController as BoutiquePromotionController;
+use App\Http\Controllers\Boutique\SubscriptionController;
 use App\Http\Controllers\BoutiqueRegistrationController;
+
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+
+
 
 // Page d'accueil
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -55,7 +61,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications-data', [ClientCommandeController::class, 'notifications'])->name('client.notifications.data');
     Route::post('/notification/{notification}/mark-read', [ClientCommandeController::class, 'markNotificationAsRead'])->name('client.notification.mark-read');
 
+    // Chat Routes
+    Route::get('/messages', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/messages/{id}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/messages/send', [ChatController::class, 'send'])->name('chat.send');
+
+    // Wishlist Routes
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+
     // Boutique Registration (for clients)
+
     Route::get('/become-seller', [BoutiqueRegistrationController::class, 'create'])->name('boutique.register');
     Route::post('/become-seller', [BoutiqueRegistrationController::class, 'store'])->name('boutique.register.store');
 
@@ -95,7 +112,17 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/avis', [\App\Http\Controllers\Admin\AvisController::class, 'index'])->name('admin.avis.index');
     Route::delete('/avis/boutique/{id}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyBoutiqueAvis'])->name('admin.avis.boutique.destroy');
     Route::delete('/avis/produit/{id}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyProduitAvis'])->name('admin.avis.produit.destroy');
+    // Monetization
+    Route::get('/monetization', [\App\Http\Controllers\Admin\MonetizationController::class, 'index'])->name('admin.monetization.index');
+    Route::get('/monetization/produit/{id}/toggle-sponsoring', [\App\Http\Controllers\Admin\MonetizationController::class, 'toggleSponsoring'])->name('admin.monetization.toggle');
+    Route::patch('/monetization/produit/{id}/priority', [\App\Http\Controllers\Admin\MonetizationController::class, 'updatePriority'])->name('admin.monetization.priority');
+    
+    // Payment Moderation
+    Route::get('/monetization/payments', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'index'])->name('admin.monetization.payments');
+    Route::patch('/monetization/payments/{id}/validate', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'validatePayment'])->name('admin.monetization.payments.validate');
+    Route::patch('/monetization/payments/{id}/reject', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'rejectPayment'])->name('admin.monetization.payments.reject');
 });
+
 
 // Boutique Routes (Vendeurs)
 Route::prefix('boutique')->middleware(['auth', 'boutique'])->group(function () {
@@ -109,8 +136,24 @@ Route::prefix('boutique')->middleware(['auth', 'boutique'])->group(function () {
     Route::resource('promotions', BoutiquePromotionController::class)->names('boutique.promotions');
     // Boutique Avis
     Route::get('/avis', [\App\Http\Controllers\Boutique\AvisController::class, 'index'])->name('boutique.avis.index');
+
+    // Boutique Subscriptions
+    Route::get('/subscription', [SubscriptionController::class, 'index'])->name('boutique.subscription.index');
+    Route::post('/subscription/pay', [SubscriptionController::class, 'pay'])->name('boutique.subscription.pay');
+    Route::get('/subscription/callback', [SubscriptionController::class, 'callback'])->name('boutique.subscription.callback');
+
+    // Manual Payments
+    Route::get('/payment/manual', [\App\Http\Controllers\Boutique\ManualPaymentController::class, 'create'])->name('boutique.payment.manual');
+    Route::post('/payment/manual', [\App\Http\Controllers\Boutique\ManualPaymentController::class, 'store'])->name('boutique.payment.store');
 });
 
-Route::get('/boutique/pending', function () {
+
+
+    Route::get('/boutique/pending', function () {
     return view('boutique.pending');
 })->middleware('auth')->name('boutique.pending');
+
+// Pages Statiques
+Route::get('/centre-aide', [HomeController::class, 'helpCenter'])->name('help.center');
+Route::get('/aide-support', [HomeController::class, 'helpSupport'])->name('help.support');
+Route::get('/informations-legales', [HomeController::class, 'legal'])->name('legal');
