@@ -9,6 +9,21 @@
 @endphp
 
 <div class="group bg-white rounded-3xl p-3 shadow-sm hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-500 border border-slate-100 flex flex-col h-full relative overflow-hidden">
+    <!-- Wishlist Button -->
+    @auth
+        <button onclick="toggleWishlist(event, '{{ $product->id_produit ?? $product->id }}')" 
+                id="wishlist-btn-{{ $product->id_produit ?? $product->id }}"
+                class="absolute top-4 right-4 z-20 w-10 h-10 rounded-xl bg-white/80 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-sm {{ auth()->user()->favoris()->where('id_produit', $product->id_produit ?? $product->id)->exists() ? 'text-rose-500' : 'text-slate-400 hover:text-rose-500' }}">
+            <i class="fas fa-heart {{ auth()->user()->favoris()->where('id_produit', $product->id_produit ?? $product->id)->exists() ? '' : 'fa-regular' }}" id="wishlist-icon-{{ $product->id_produit ?? $product->id }}"></i>
+        </button>
+    @endauth
+
+    @if($product->est_sponsorise)
+        <div class="absolute top-4 left-4 z-20 px-3 py-1 bg-amber-400 text-white text-[9px] font-black rounded-lg shadow-lg shadow-amber-400/20 uppercase tracking-widest flex items-center gap-1">
+            <i class="fas fa-star text-[8px]"></i> Sponsorisé
+        </div>
+    @endif
+
     <!-- Image Wrapper -->
     <a href="{{ route('produit.show', $product->id_produit ?? $product->id) }}" class="relative aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-4 block">
         <img src="{{ asset('images/' . $product->image_principale_produit) }}" 
@@ -32,7 +47,12 @@
     <!-- Info -->
     <div class="flex flex-col flex-1 px-1">
         <div class="flex items-center gap-2 mb-2">
-            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $product->boutique->nom_boutique ?? 'Ondigoci' }}</span>
+            <div class="flex items-center gap-1">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[80px]">{{ $product->boutique->nom_boutique ?? 'Ondigoci' }}</span>
+                @if($product->boutique && $product->boutique->est_verifie)
+                    <i class="fas fa-check-circle text-blue-400 text-[8px]" title="Vendeur Vérifié"></i>
+                @endif
+            </div>
             <div class="h-1 w-1 rounded-full bg-slate-300"></div>
             <div class="flex text-orange-400 text-[8px]">
                 @for($i = 1; $i <= 5; $i++)

@@ -43,13 +43,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #f1f5f9;
+        }
+
+        .dark {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8fafc;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        .bg-white { background-color: var(--bg-card) !important; }
+        .bg-slate-50 { background-color: var(--bg-main) !important; }
+        .text-slate-900 { color: var(--text-main) !important; }
+        .text-slate-600, .text-slate-500 { color: var(--text-muted) !important; }
+        .border-slate-100, .border-slate-50 { border-color: var(--border-color) !important; }
+
+        /* Dark mode overrides */
+        .dark .glass-header {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .dark .bg-slate-100 { background-color: #334155 !important; }
+        .dark .text-slate-700 { color: #f1f5f9 !important; }
+        .dark .dropdown-menu { background-color: #1e293b; border: 1px solid #334155; }
+        .dark .dropdown-item { color: #f1f5f9; }
+        .dark .dropdown-item:hover { background-color: #334155; }
+        
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
@@ -118,7 +153,7 @@
     
     @yield('styles')
 </head>
-<body>
+<body class="overflow-x-hidden">
     <!-- Top Announcement Bar -->
     @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
     <div class="bg-primary-900 text-white py-2 text-[10px] font-black uppercase tracking-[0.2em] text-center hidden md:block">
@@ -164,14 +199,41 @@
 
                 <!-- Actions -->
                 <div class="flex items-center gap-4">
+                    <!-- Dark Mode Toggle -->
+                    <button id="themeToggle" class="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-2xl text-slate-600 dark:text-amber-400 hover:scale-110 transition-all border-0 outline-none">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+
                     @auth
                         @if(Auth::user()->role === 'client' || request()->has('preview'))
                         <!-- Cart -->
-                        <a href="{{ route('cart.index') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group">
+                        <button onclick="toggleCart()" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group border-0 outline-none">
                             <i class="fas fa-shopping-cart text-lg"></i>
                             <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
                                 {{ Auth::user()->paniers()->sum('quantite') ?: 0 }}
                             </span>
+                        </button>
+
+                        <a href="{{ route('wishlist.index') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-rose-500 transition-colors group">
+                            <i class="fas fa-heart text-lg"></i>
+                            @php $wishlistCount = \App\Models\Favori::where('user_id', auth()->id())->count(); @endphp
+                            @if($wishlistCount > 0)
+                                <span class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
+                                    {{ $wishlistCount }}
+                                </span>
+                            @endif
+                        </a>
+
+                        <a href="{{ route('chat.index') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group">
+
+                            <i class="fas fa-comment-dots text-lg"></i>
+                            @php $unreadChat = \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count(); @endphp
+                            @if($unreadChat > 0)
+                                <span class="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm group-hover:scale-110 transition-transform animate-bounce">
+                                    {{ $unreadChat }}
+                                </span>
+                            @endif
                         </a>
 
                         <a href="{{ route('client.notifications') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group">
@@ -179,6 +241,7 @@
                             <span id="notificationBadge" class="absolute top-2.5 right-2.5 w-2 h-2 bg-orange-500 rounded-full border-2 border-white" style="display: none;"></span>
                         </a>
                         @endif
+
 
                         <!-- User Profile Dropdown -->
                         <div class="dropdown">
@@ -214,7 +277,7 @@
                             </ul>
                         </div>
                     @else
-                        <div class="flex items-center gap-2">
+                        <div class="hidden md:flex items-center gap-2">
                             <a href="{{ route('login') }}" class="px-6 py-2.5 text-sm font-black text-primary-500 hover:text-primary-600 transition-colors uppercase tracking-widest">Connexion</a>
                             <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-500 text-white text-sm font-black rounded-2xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/20 uppercase tracking-widest">S'inscrire</a>
                         </div>
@@ -255,7 +318,7 @@
                         <a href="{{ url('/') }}" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Accueil</a>
                         <a href="{{ route('shop') }}" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Boutique</a>
                         <a href="{{ route('shop') }}" class="text-sm font-bold text-orange-500 hover:text-orange-600 transition-colors py-4 border-b-2 border-transparent hover:border-orange-500">Ventes Flash <i class="fas fa-bolt ms-1"></i></a>
-                        <a href="#" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Aide & Support</a>
+                        <a href="{{ route('help.support') }}" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Aide & Support</a>
                     </div>
                 </div>
             </div>
@@ -296,16 +359,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <!-- Brand -->
                 <div class="space-y-6">
-                    <a href="{{ url('/') }}" class="flex items-center gap-2 group">
+                    <a href="{{ url('/') }}" class="flex items-center justify-center md:justify-start gap-2 group">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-500 shadow-lg">
                             <i class="fas fa-handshake"></i>
                         </div>
                         <span class="text-2xl font-black tracking-tighter text-white">Ondigoci</span>
                     </a>
-                    <p class="text-primary-100/60 text-sm leading-relaxed">
+                    <p class="text-primary-100/60 text-sm leading-relaxed text-center md:text-left">
                         Ondigoci est votre marketplace de confiance en Côte d'Ivoire. Nous connectons les vendeurs locaux aux acheteurs exigeants.
                     </p>
-                    <div class="flex gap-4">
+                    <div class="flex justify-center md:justify-start gap-4">
                         <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-orange-500 transition-all group">
                             <i class="fab fa-facebook-f text-sm group-hover:scale-110"></i>
                         </a>
@@ -319,7 +382,7 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div>
+                <div class="text-center md:text-left">
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Navigation Rapide</h5>
                     <ul class="space-y-4">
                         @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
@@ -327,31 +390,40 @@
                         <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Ventes Flash</a></li>
                         <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Devenir Vendeur</a></li>
                         @endif
-                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Centre d'aide</a></li>
+                        <li><a href="{{ route('help.center') }}" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Centre d'aide</a></li>
                     </ul>
                 </div>
 
                 <!-- Legal -->
-                <div>
+                <div class="text-center md:text-left">
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Informations Légales</h5>
                     <ul class="space-y-4">
-                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Conditions d'utilisation</a></li>
-                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Politique de confidentialité</a></li>
-                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Mentions Légales</a></li>
+                        <li><a href="{{ route('legal') }}" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Conditions d'utilisation</a></li>
+                        <li><a href="{{ route('legal') }}" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Politique de confidentialité</a></li>
+                        <li><a href="{{ route('legal') }}" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Mentions Légales</a></li>
                     </ul>
                 </div>
 
                 <!-- Contact -->
-                <div>
+                <div class="text-center md:text-left">
                     <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Nous contacter</h5>
                     <div class="space-y-4">
-                        <div class="flex items-center gap-4 group">
+                        <div class="flex items-center justify-center md:justify-start gap-4 group">
                             <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
                                 <i class="fas fa-phone-alt text-sm"></i>
                             </div>
-                            <p class="text-primary-100/60 text-sm font-medium">+225 05 05 05 05 05</p>
+                            <div class="flex flex-col text-left">
+                                <p class="text-primary-100/60 text-sm font-medium">05 76 15 67 37</p>
+                                <p class="text-primary-100/60 text-sm font-medium">07 02 44 85 92</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-4 group">
+                        <a href="https://wa.me/2250576156737" target="_blank" class="flex items-center justify-center md:justify-start gap-4 group">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                <i class="fab fa-whatsapp text-sm"></i>
+                            </div>
+                            <p class="text-primary-100/60 text-sm font-medium">Contact WhatsApp</p>
+                        </a>
+                        <div class="flex items-center justify-center md:justify-start gap-4 group">
                             <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
                                 <i class="fas fa-envelope text-sm"></i>
                             </div>
@@ -376,7 +448,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Dark Mode Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            const isDark = htmlElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
         // Instant Search Logic
+
         const searchInput = document.getElementById('instantSearch');
         const resultsBox = document.getElementById('searchResults');
         const resultsContent = document.getElementById('resultsContent');
@@ -470,6 +558,35 @@
             }, 4000);
         }
 
+        // Side Cart Logic
+        function toggleCart() {
+            const drawer = document.getElementById('sideCart');
+            const overlay = document.getElementById('sideCartOverlay');
+            const isOpening = drawer.classList.contains('translate-x-full');
+            
+            if (isOpening) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                refreshSideCart();
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+            }
+        }
+
+        function refreshSideCart() {
+            const content = document.getElementById('sideCartContent');
+            const total = document.getElementById('sideCartTotal');
+            
+            fetch('{{ route("cart.index") }}?partial=true')
+                .then(response => response.text())
+                .then(html => {
+                    content.innerHTML = html;
+                    const totalVal = document.querySelector('[data-cart-total]')?.dataset.cartTotal || '0';
+                    total.textContent = totalVal + ' FCFA';
+                });
+        }
+
         // Standardized AddToCart
         function addToCart(productId) {
             @guest
@@ -497,6 +614,7 @@
                         setTimeout(() => badge.classList.remove('scale-125'), 300);
                     }
                     showToast('Produit ajouté au panier !');
+                    toggleCart(); // Open side cart on add
                 } else {
                     showToast(data.message || 'Erreur lors de l\'ajout', 'error');
                 }
@@ -506,6 +624,7 @@
                 showToast('Une erreur est survenue', 'error');
             });
         }
+
 
         // Notification Badge Update
         function updateNotificationBadge() {
@@ -527,11 +646,122 @@
             @endauth
         }
 
+        function toggleWishlist(e, productId) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            fetch('{{ route("wishlist.toggle") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ id_produit: productId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const btn = document.getElementById(`wishlist-btn-${productId}`);
+                const icon = document.getElementById(`wishlist-icon-${productId}`);
+                
+                if (data.status === 'added') {
+                    btn.classList.add('text-rose-500');
+                    btn.classList.remove('text-slate-400');
+                    icon.classList.remove('fa-regular');
+                    showToast(data.message, 'success');
+                } else {
+                    btn.classList.remove('text-rose-500');
+                    btn.classList.add('text-slate-400');
+                    icon.classList.add('fa-regular');
+                    showToast(data.message, 'info');
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
         document.addEventListener('DOMContentLoaded', updateNotificationBadge);
         setInterval(updateNotificationBadge, 30000);
     </script>
 
+
+
+
+    <!-- Side Cart Drawer -->
+    <div id="sideCart" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-white z-[10000] shadow-2xl translate-x-full transition-transform duration-500 ease-in-out flex flex-col overflow-x-hidden">
+        <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+            <h3 class="text-2xl font-black text-primary-900 tracking-tighter">Mon Panier</h3>
+            <button onclick="toggleCart()" class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="sideCartContent" class="flex-1 overflow-y-auto p-8 space-y-6">
+            <!-- Content will be loaded via AJAX -->
+            <div class="text-center py-20">
+                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mx-auto mb-6">
+                    <i class="fas fa-shopping-basket text-2xl"></i>
+                </div>
+                <p class="text-slate-400 font-medium italic">Chargement de votre panier...</p>
+            </div>
+        </div>
+
+        <div class="p-8 bg-slate-50 space-y-4">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Total Estimé</span>
+                <span id="sideCartTotal" class="text-2xl font-black text-primary-500">0 FCFA</span>
+            </div>
+            <a href="{{ route('cart.index') }}" class="w-full py-4 bg-primary-500 text-white font-black rounded-2xl hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/20 uppercase tracking-widest text-center block">Voir le panier complet</a>
+            <button onclick="toggleCart()" class="w-full py-4 text-slate-400 font-black uppercase tracking-widest text-xs hover:text-primary-500 transition-colors">Continuer mes achats</button>
+        </div>
+    </div>
+    <div id="sideCartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-primary-900/40 backdrop-blur-sm z-[9999] opacity-0 pointer-events-none transition-opacity duration-500"></div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 px-6 py-3 flex justify-between items-center z-[5000] md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.05)] rounded-t-[2rem]">
+        <a href="{{ route('wishlist.index') }}" class="relative flex flex-col items-center gap-1 {{ request()->routeIs('wishlist.*') ? 'text-rose-500' : 'text-slate-400' }}">
+            <i class="fas fa-heart text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-widest">Favoris</span>
+            @if(isset($wishlistCount) && $wishlistCount > 0)
+                <span class="absolute top-0 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
+            @endif
+        </a>
+
+        <a href="{{ route('shop') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('shop') ? 'text-primary-500' : 'text-slate-400' }}">
+            <i class="fas fa-search text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-widest">Explorer</span>
+        </a>
+        <button onclick="toggleCart()" class="relative -translate-y-6 w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary-500/30 border-4 border-white">
+            <i class="fas fa-shopping-basket text-xl"></i>
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                {{ Auth::check() ? Auth::user()->paniers()->sum('quantite') : 0 }}
+            </span>
+        </button>
+        <a href="{{ route('chat.index') }}" class="relative flex flex-col items-center gap-1 {{ request()->routeIs('chat.*') ? 'text-primary-500' : 'text-slate-400' }}">
+            <i class="fas fa-comment-dots text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-widest">Messages</span>
+            @if(isset($unreadChat) && $unreadChat > 0)
+                <span class="absolute top-0 right-1 w-2 h-2 bg-orange-500 rounded-full border border-white"></span>
+            @endif
+        </a>
+
+        <div class="flex flex-col items-center gap-1 text-slate-400">
+            @auth
+                <a href="{{ Auth::user()->role === 'client' ? route('client.commandes') : route('boutique.dashboard') }}" class="flex flex-col items-center gap-1">
+                    <i class="fas fa-user-circle text-lg"></i>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Moi</span>
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="flex flex-col items-center gap-1">
+                    <i class="fas fa-sign-in-alt text-lg"></i>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Login</span>
+                </a>
+            @endauth
+        </div>
+    </div>
+
+
     <!-- Toast Container -->
+
     <div id="universal-toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center"></div>
 
     <style>
@@ -540,11 +770,33 @@
             50% { transform: translateY(10px) scale(1.05); opacity: 1; }
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
-        .animate-bounce-in {
-            animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        @keyframes shimmer {
+            0% { background-position: -468px 0; }
+            100% { background-position: 468px 0; }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        html {
+            scroll-behavior: smooth;
         }
     </style>
+
+
     
-    @yield('scripts')
+    @stack('scripts')
+
 </body>
 </html>

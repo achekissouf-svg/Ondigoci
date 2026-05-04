@@ -34,8 +34,13 @@
                     <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill me-2">
                         {{ $produit->categorie->libel_categorie }}
                     </span>
-                    @if($produit->id_promo)
-                        <span class="badge bg-danger px-3 py-2 rounded-pill">PROMO</span>
+                    @if($produit->promotion && $produit->promotion->date_fin_promo >= now())
+                        <div class="flex items-center gap-3 px-4 py-2 bg-rose-500 text-white rounded-full shadow-lg shadow-rose-500/20 animate-pulse">
+                            <i class="fas fa-bolt"></i>
+                            <div class="flex items-center gap-1 font-black text-xs" id="flashTimer" data-end="{{ $produit->promotion->date_fin_promo->format('Y-m-d H:i:s') }}">
+                                <span id="days">00</span>j : <span id="hours">00</span>h : <span id="minutes">00</span>m : <span id="seconds">00</span>s
+                            </div>
+                        </div>
                     @endif
                 </div>
 
@@ -107,30 +112,57 @@
                     </div>
                 </div>
 
-                <div class="d-grid gap-3 d-md-flex">
+                <div class="flex flex-col gap-3">
                     @if($produit->stock_disponible_produit > 0)
-                        <button onclick="addToCart('{{ $produit->id_produit }}')" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-3 shadow-sm flex-grow-1">
+                        <button onclick="addToCart('{{ $produit->id_produit }}')" class="w-full bg-primary-500 text-white py-4 font-black rounded-2xl hover:bg-primary-600 transition-all shadow-xl shadow-primary-500/20 uppercase tracking-widest text-center">
                             <i class="fas fa-cart-plus me-2"></i> Ajouter au panier
                         </button>
                     @endif
                     
-                    @if($produit->boutique->user_id !== auth()->id())
-                        @if($produit->boutique->whatsapp)
-                            <a href="https://api.whatsapp.com/send?phone={{ preg_replace('/[^0-9]/', '', $produit->boutique->whatsapp) }}&text=Bonjour {{ $produit->boutique->nom_boutique }}, je suis intéressé par votre produit : {{ $produit->nom_produit }}" 
-                               class="btn btn-outline-success btn-lg px-4 py-3 fw-bold rounded-3 shadow-sm">
-                                <i class="fab fa-whatsapp me-2"></i> Contacter
+                    <div class="grid grid-cols-2 gap-3">
+                        @if($produit->boutique->user_id !== auth()->id())
+                            <a href="{{ route('chat.show', $produit->boutique->user_id) }}" class="flex items-center justify-center gap-2 bg-slate-100 text-slate-800 py-4 font-black rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-xs">
+                                <i class="fas fa-comment-dots text-primary-500"></i> Discuter
                             </a>
-                        @elseif($produit->boutique->user->telephone)
-                            <a href="https://api.whatsapp.com/send?phone={{ preg_replace('/[^0-9]/', '', $produit->boutique->user->telephone) }}&text=Bonjour {{ $produit->boutique->nom_boutique }}, je suis intéressé par votre produit : {{ $produit->nom_produit }}" 
-                               class="btn btn-outline-success btn-lg px-4 py-3 fw-bold rounded-3 shadow-sm">
-                                <i class="fab fa-whatsapp me-2"></i> Contacter
-                            </a>
+
+                            @if($produit->boutique->whatsapp)
+                                <a href="https://api.whatsapp.com/send?phone={{ preg_replace('/[^0-9]/', '', $produit->boutique->whatsapp) }}&text=Bonjour {{ $produit->boutique->nom_boutique }}, je suis intéressé par votre produit : {{ $produit->nom_produit }}" 
+                                   class="flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 py-4 font-black rounded-2xl hover:bg-emerald-500 hover:text-white transition-all uppercase tracking-widest text-xs border border-emerald-100">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            @endif
+
+                            @if($produit->boutique->user->telephone)
+                                <a href="tel:{{ preg_replace('/[^0-9]/', '', $produit->boutique->user->telephone) }}" 
+                                   class="flex items-center justify-center gap-2 bg-primary-50 text-primary-600 py-4 font-black rounded-2xl hover:bg-primary-500 hover:text-white transition-all uppercase tracking-widest text-xs border border-primary-100 col-span-2">
+                                    <i class="fas fa-phone"></i> Appeler le vendeur
+                                </a>
+                            @endif
                         @endif
-                    @endif
+                    </div>
                 </div>
+
+
+                <!-- Location Info -->
+                @if($produit->boutique->adresse)
+                <div class="mt-8 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4">
+                    <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 flex-shrink-0">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Localisation du magasin</p>
+                        <p class="text-sm font-bold text-slate-700 leading-tight mb-3">{{ $produit->boutique->adresse }}</p>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($produit->boutique->adresse) }}" 
+                           target="_blank" class="text-xs font-black text-primary-500 hover:text-orange-500 transition-colors uppercase tracking-widest">
+                           Voir sur Google Maps <i class="fas fa-external-link-alt ms-1 text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
+
 
     <!-- Reviews Section -->
     <div class="row mt-5 pt-5 border-top">
@@ -287,4 +319,37 @@
     }
 </style>
 
+@push('scripts')
+<script>
+    function updateTimer() {
+        const timerEl = document.getElementById('flashTimer');
+        if (!timerEl) return;
+
+        const endDate = new Date(timerEl.dataset.end).getTime();
+        const now = new Date().getTime();
+        const distance = endDate - now;
+
+        if (distance < 0) {
+            timerEl.innerHTML = "PROMOTION TERMINÉE";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = days.toString().padStart(2, '0');
+        document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+    }
+
+    if (document.getElementById('flashTimer')) {
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    }
+</script>
+@endpush
 @endsection
+

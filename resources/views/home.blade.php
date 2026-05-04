@@ -5,45 +5,10 @@
 @section('content')
 <div class="bg-white">
     <div class="container mx-auto px-4 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar Categories (Visible by default on Home) -->
-            <aside class="w-full lg:w-72 flex-shrink-0 hidden lg:block">
-                <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-                    <div class="bg-primary-500 p-6">
-                        <h3 class="text-white font-black uppercase tracking-widest text-xs flex items-center gap-3">
-                            <i class="fas fa-th-large"></i> Catégories
-                        </h3>
-                    </div>
-                    <nav class="p-4">
-                        <ul class="space-y-1">
-                            @if(isset($layoutCategories))
-                                @foreach($layoutCategories as $cat)
-                                    <li>
-                                        <a href="{{ route('shop', ['q' => $cat->libel_categorie]) }}" 
-                                           class="flex items-center justify-between p-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-primary-50 hover:text-primary-600 transition-all group">
-                                            {{ $cat->libel_categorie }}
-                                            <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all"></i>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            @endif
-                        </ul>
-                    </nav>
-                </div>
-
-                <!-- Promo Banner Sidebar -->
-                <div class="mt-6 rounded-[2rem] bg-gradient-to-br from-orange-500 to-rose-600 p-8 text-white relative overflow-hidden group">
-                    <div class="relative z-10">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-80">Offre Spéciale</p>
-                        <h4 class="text-xl font-black mb-4">-20% sur la Mode</h4>
-                        <a href="{{ route('shop') }}" class="inline-block px-6 py-2 bg-white text-orange-600 text-xs font-black rounded-xl uppercase tracking-widest hover:scale-105 transition-transform">Voir plus</a>
-                    </div>
-                    <i class="fas fa-shopping-bag absolute -bottom-4 -right-4 text-7xl opacity-10 group-hover:rotate-12 transition-transform"></i>
-                </div>
-            </aside>
-
+        <div class="w-full overflow-hidden">
             <!-- Main Content Area -->
-            <div class="flex-1 min-w-0">
+            <div class="min-w-0">
+
                 <!-- Hero Section -->
                 <div class="relative rounded-[2.5rem] bg-slate-900 h-[400px] lg:h-[500px] overflow-hidden shadow-2xl group">
                     <!-- Background Visuals -->
@@ -75,7 +40,7 @@
                 </div>
 
                 <!-- Stats/Advantages Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
                     <div class="p-6 rounded-[2rem] bg-primary-50 border border-primary-100 flex flex-col items-center text-center group hover:bg-primary-500 transition-all duration-500">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary-500 shadow-sm mb-4 group-hover:scale-110 transition-transform">
                             <i class="fas fa-truck-fast"></i>

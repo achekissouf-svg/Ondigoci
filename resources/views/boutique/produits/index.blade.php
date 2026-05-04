@@ -67,7 +67,15 @@
                 <div class="card-body p-3">
                     <h6 class="fw-bold mb-1" style="color: #333; font-size: 0.9rem;">{{ $produit->nom_produit }}</h6>
                     <p class="fw-bold mb-2" style="color: #1e5a9e; font-size: 1rem;">{{ number_format($produit->prix_unitaire_produit, 0, ',', ' ') }} FCFA</p>
-                    <p class="text-muted small mb-3">Stock : {{ $produit->stock_disponible_produit }} unité(s)</p>
+                    <div class="mb-3">
+                        <span class="text-muted small">Stock : </span>
+                        <span class="fw-bold {{ $produit->stock_disponible_produit <= 5 ? 'text-danger' : 'text-success' }}" style="font-size: 0.85rem;">
+                            {{ $produit->stock_disponible_produit }} unité(s)
+                        </span>
+                        @if($produit->stock_disponible_produit <= 5)
+                            <span class="badge bg-danger ms-1" style="font-size: 0.6rem; vertical-align: middle;">STOCK BAS</span>
+                        @endif
+                    </div>
                     <div class="d-flex gap-2">
                         <a href="{{ route('boutique.produits.edit', $produit->id_produit) }}" class="btn btn-outline-primary btn-sm flex-fill">
                             <i class="fas fa-edit"></i> Modifier
