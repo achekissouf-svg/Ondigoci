@@ -60,17 +60,22 @@ class PanierController extends Controller
      */
     public function index()
     {
-        $paniers = Panier::with('produit')->where('user_id', auth()->id())->get();
+        $paniers = Panier::with('produit.boutique')->where('user_id', auth()->id())->get();
         
+        // Group by boutique for a clearer UI
+        $groupedPaniers = $paniers->groupBy(function($item) {
+            return $item->produit->boutique->nom_boutique ?? 'Ondigoci Store';
+        });
+
         $total = 0;
         foreach ($paniers as $item) {
-            $prix = $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit;
+            $prix = $item->produit->prixAvecReduction();
             $total += ($prix * $item->quantite);
         }
 
         $modesPaiement = \App\Models\ModePaiement::all();
 
-        return view('cart.index', compact('paniers', 'total', 'modesPaiement'));
+        return view('cart.index', compact('groupedPaniers', 'total', 'modesPaiement'));
     }
 
     /**

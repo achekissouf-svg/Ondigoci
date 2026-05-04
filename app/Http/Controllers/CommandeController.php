@@ -29,7 +29,7 @@ class CommandeController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        $paniers = \App\Models\Panier::where('user_id', $user->id)->get();
+        $paniers = \App\Models\Panier::with('produit')->where('user_id', $user->id)->get();
 
         $request->validate([
             'adresse_livraison' => 'required|string|max:255',
@@ -41,50 +41,56 @@ class CommandeController extends Controller
             return redirect()->route('shop')->with('error', 'Votre panier est vide.');
         }
 
-        // Calculate total
-        $total = 0;
-        foreach ($paniers as $item) {
-            $prix = $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit;
-            $total += ($prix * $item->quantite);
-        }
+        // Group items by boutique to allow separate management
+        $groupedByBoutique = $paniers->groupBy(function($item) {
+            return $item->produit->boutique_id;
+        });
 
-        // Create Commande
-        $commande = Commande::create([
-            'id_commande' => \Illuminate\Support\Str::uuid(),
-            'num_commande' => 'CMD-' . strtoupper(\Illuminate\Support\Str::random(10)),
-            'date_commande' => now(),
-            'montant_total_commande' => $total,
-            'statut_commande' => 'en_attente',
-            'id_mode_paiement' => $request->id_mode_paiement,
-            'user_id' => $user->id,
-            'telephone_commande' => $request->input('telephone_commande') ?? $user->telephone,
-        ]);
+        foreach ($groupedByBoutique as $boutiqueId => $items) {
+            $totalBoutique = 0;
+            foreach ($items as $item) {
+                $totalBoutique += ($item->produit->prixAvecReduction() * $item->quantite);
+            }
 
-        // Create LigneCommandes
-        foreach ($paniers as $item) {
-            \App\Models\LigneCommande::create([
-                'id_ligne_commande' => \Illuminate\Support\Str::uuid(),
-                'id_produit' => $item->id_produit,
+            // Create a separate Commande for each boutique
+            $commande = Commande::create([
+                'id_commande' => \Illuminate\Support\Str::uuid(),
+                'num_commande' => 'CMD-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                'date_commande' => now(),
+                'montant_total_commande' => $totalBoutique,
+                'statut_commande' => 'en_attente',
+                'id_mode_paiement' => $request->id_mode_paiement,
+                'user_id' => $user->id,
+                'boutique_id' => $boutiqueId,
+                'telephone_commande' => $request->input('telephone_commande') ?? $user->telephone,
+            ]);
+
+            // Create LigneCommandes for this boutique's sub-order
+            foreach ($items as $item) {
+                \App\Models\LigneCommande::create([
+                    'id_ligne_commande' => \Illuminate\Support\Str::uuid(),
+                    'id_produit' => $item->id_produit,
+                    'id_commande' => $commande->id_commande,
+                    'quantite_ligne_commande' => $item->quantite,
+                    'prix_au_moment_achat' => $item->produit->prixAvecReduction(),
+                ]);
+            }
+
+            // Create a separate Livraison record for this boutique's order
+            \App\Models\Livraison::create([
+                'id_livraison' => \Illuminate\Support\Str::uuid(),
                 'id_commande' => $commande->id_commande,
-                'quantite_ligne_commande' => $item->quantite,
-                'prix_au_moment_achat' => $item->produit->prixAvecReduction() ?? $item->produit->prix_unitaire_produit,
+                'adresse_livraison' => $request->adresse_livraison,
+                'date_estimee' => now()->addDays(3), // Estimated delivery
+                'frais_livraison' => 0,
+                'statut_livraison' => 'en_attente',
             ]);
         }
 
-        // Create Livraison record
-        \App\Models\Livraison::create([
-            'id_livraison' => \Illuminate\Support\Str::uuid(),
-            'id_commande' => $commande->id_commande,
-            'adresse_livraison' => $request->adresse_livraison,
-            'date_estimee' => now()->addDays(2), // Estimated delivery
-            'frais_livraison' => 0, // Set to 0 or calculate
-            'statut_livraison' => 'en_attente',
-        ]);
-
-        // Empty Cart
+        // Empty the cart after all orders are created
         \App\Models\Panier::where('user_id', $user->id)->delete();
 
-        return redirect()->route('home')->with('success', 'Votre commande a été passée avec succès !');
+        return redirect()->route('home')->with('success', 'Votre commande a été passée avec succès ! Vos articles ont été séparés par vendeur pour une meilleure gestion de la livraison.');
     }
 
     /**

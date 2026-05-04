@@ -1,6 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Nouvelle Catégorie')
+
+@section('header_title', 'Gestion des Catégories')
 
 @section('content')
 <div class="container py-5">

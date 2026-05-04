@@ -85,7 +85,7 @@ class ClientCommandeController extends Controller
      */
     public function notificationsPage()
     {
-        $notifications = Notification::where('user_id', Auth::id())
+        $notifications = Notification::with('commande')->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 

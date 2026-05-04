@@ -3,199 +3,142 @@
 @section('title', 'Votre Shopping Livré en un Clic')
 
 @section('content')
-@section('content')
-<div class="container py-5">
-    <div class="row align-items-center mb-4">
-        <div class="col-md-8">
-            <h1 class="fw-bold" style="color: #1e5a9e;">Bienvenue sur Ondigoci</h1>
-            <p class="text-muted">Découvrez les derniers produits publiés par nos boutiques partenaires.</p>
-        </div>
-        <div class="col-md-4 text-md-end">
-            <a href="{{ route('shop') }}" class="btn fw-bold text-white px-4" style="background: #ff6b35; border-radius: 8px;">
-                TOUT LE CATALOGUE <i class="fas fa-th ms-2"></i>
-            </a>
-        </div>
-    </div>
-
-
-<!-- Featured Products Section -->
-<div class="container py-5">
-    <h2 class="mb-4 fw-bold" style="font-size: 2rem; color: #1e5a9e;">Nos Produits en Vedette</h2>
-    
-    @if(isset($featuredProducts) && count($featuredProducts) > 0)
-        <div class="row g-4">
-            @foreach($featuredProducts as $product)
-            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                <div class="card h-100 shadow-sm" style="border: none; border-radius: 12px; overflow: hidden; cursor: pointer;">
-                    <a href="{{ route('produit.show', $product->id_produit) }}" class="card-img-top" style="height: 200px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; padding: 15px; text-decoration: none;">
-                        <img src="{{ asset('images/' . $product->image_principale_produit) }}" 
-                             alt="{{ $product->nom_produit }}"
-                             style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </a>
-                        <div class="card-body text-center">
-                            <h6 class="card-title fw-semibold mb-2" style="font-size: 0.95rem; min-height: 45px; color: #333;">
-                                <a href="{{ route('produit.show', $product->id_produit) }}" class="text-decoration-none text-dark">
-                                    {{ $product->nom_produit }}
-                                </a>
-                            </h6>
-                            <p class="card-text fw-bold mb-3" style="font-size: 1.1rem; color: #1e5a9e;">
-                                {{ number_format($product->prix_unitaire_produit, 0, ',', ' ') }} FCFA
-                            </p>
-                            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'boutique'))
-                                <a href="{{ auth()->user()->role === 'admin' ? route('admin.produits.index') : route('boutique.produits.index') }}"
-                                   class="btn w-100 fw-semibold"
-                                   style="background: #1e5a9e; color:white; border-radius: 8px; padding: 10px; font-size: 0.85rem; transition: background 0.3s;"
-                                   onmouseover="this.style.background='#ff6b35'" onmouseout="this.style.background='#1e5a9e'">
-                                    <i class="fas fa-cog me-1"></i> Gérer mes produits
-                                </a>
-                            @else
-                                <button class="btn btn-primary w-100 fw-semibold"
-                                        style="background: #1e5a9e; border: none; border-radius: 8px; padding: 10px; font-size: 0.85rem; transition: background 0.3s;"
-                                        onmouseover="this.style.background='#ff6b35'"
-                                        onmouseout="this.style.background='#1e5a9e'"
-                                        onclick="addToCart('{{ $product->id_produit }}')">
-                                    Ajouter au Panier
-                                </button>
+<div class="bg-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar Categories (Visible by default on Home) -->
+            <aside class="w-full lg:w-72 flex-shrink-0 hidden lg:block">
+                <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="bg-primary-500 p-6">
+                        <h3 class="text-white font-black uppercase tracking-widest text-xs flex items-center gap-3">
+                            <i class="fas fa-th-large"></i> Catégories
+                        </h3>
+                    </div>
+                    <nav class="p-4">
+                        <ul class="space-y-1">
+                            @if(isset($layoutCategories))
+                                @foreach($layoutCategories as $cat)
+                                    <li>
+                                        <a href="{{ route('shop', ['q' => $cat->libel_categorie]) }}" 
+                                           class="flex items-center justify-between p-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-primary-50 hover:text-primary-600 transition-all group">
+                                            {{ $cat->libel_categorie }}
+                                            <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all"></i>
+                                        </a>
+                                    </li>
+                                @endforeach
                             @endif
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Promo Banner Sidebar -->
+                <div class="mt-6 rounded-[2rem] bg-gradient-to-br from-orange-500 to-rose-600 p-8 text-white relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-80">Offre Spéciale</p>
+                        <h4 class="text-xl font-black mb-4">-20% sur la Mode</h4>
+                        <a href="{{ route('shop') }}" class="inline-block px-6 py-2 bg-white text-orange-600 text-xs font-black rounded-xl uppercase tracking-widest hover:scale-105 transition-transform">Voir plus</a>
+                    </div>
+                    <i class="fas fa-shopping-bag absolute -bottom-4 -right-4 text-7xl opacity-10 group-hover:rotate-12 transition-transform"></i>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 min-w-0">
+                <!-- Hero Section -->
+                <div class="relative rounded-[2.5rem] bg-slate-900 h-[400px] lg:h-[500px] overflow-hidden shadow-2xl group">
+                    <!-- Background Visuals -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-900 via-primary-900/80 to-transparent z-10"></div>
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" 
+                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                    
+                    <!-- Hero Content -->
+                    <div class="relative z-20 h-full flex flex-col justify-center px-8 lg:px-16 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 text-orange-400 rounded-full mb-6 w-fit backdrop-blur-sm border border-orange-500/20">
+                            <i class="fas fa-bolt text-xs"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Nouveautés 2026</span>
                         </div>
+                        <h1 class="text-4xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tighter">
+                            Achetez local, <br>Vivez <span class="text-orange-500">Mieux</span>.
+                        </h1>
+                        <p class="text-lg text-slate-300 mb-10 font-medium">
+                            Découvrez des produits authentiques sélectionnés parmi les meilleures boutiques de Côte d'Ivoire.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="{{ route('shop') }}" class="px-8 py-4 bg-orange-500 text-white font-black rounded-2xl hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/25 uppercase tracking-widest flex items-center gap-3">
+                                Explorer le catalogue <i class="fas fa-arrow-right text-xs"></i>
+                            </a>
+                            <a href="{{ route('boutique.register') }}" class="px-8 py-4 bg-white/10 text-white font-black rounded-2xl hover:bg-white/20 transition-all backdrop-blur-md uppercase tracking-widest border border-white/10">
+                                Devenir Vendeur
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            @endforeach
-        </div>
-    @else
-        <div class="text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-4" style="width: 130px; height: 130px;">
-                <i class="fas fa-store-slash text-muted" style="font-size: 3.5rem; opacity: 0.4;"></i>
-            </div>
-            <h4 class="fw-bold">Aucun produit disponible</h4>
-            <p class="text-muted">Revenez plus tard pour découvrir les nouveautés de nos vendeurs.</p>
-        </div>
-    @endif
-</div>
 
-<!-- Section Avantages -->
-<div class="bg-light py-5 mt-5">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3 col-6 mb-4">
-                <div class="p-3">
-                    <i class="fas fa-truck fa-3x mb-3" style="color: #1e5a9e;"></i>
-                    <h5 class="fw-bold">Livraison Rapide</h5>
-                    <p class="text-muted">Partout en Côte d'Ivoire</p>
+                <!-- Stats/Advantages Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                    <div class="p-6 rounded-[2rem] bg-primary-50 border border-primary-100 flex flex-col items-center text-center group hover:bg-primary-500 transition-all duration-500">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary-500 shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-truck-fast"></i>
+                        </div>
+                        <h5 class="text-xs font-black uppercase tracking-widest text-primary-900 group-hover:text-white mb-1">Livraison Express</h5>
+                        <p class="text-[10px] font-bold text-primary-500/60 group-hover:text-white/60 uppercase">Partout en CI</p>
+                    </div>
+                    <div class="p-6 rounded-[2rem] bg-orange-50 border border-orange-100 flex flex-col items-center text-center group hover:bg-orange-500 transition-all duration-500">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-orange-500 shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h5 class="text-xs font-black uppercase tracking-widest text-orange-900 group-hover:text-white mb-1">Paiement Sécurisé</h5>
+                        <p class="text-[10px] font-bold text-orange-500/60 group-hover:text-white/60 uppercase">100% Garanti</p>
+                    </div>
+                    <div class="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 flex flex-col items-center text-center group hover:bg-slate-900 transition-all duration-500">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-900 shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h5 class="text-xs font-black uppercase tracking-widest text-slate-900 group-hover:text-white mb-1">Support H24</h5>
+                        <p class="text-[10px] font-bold text-slate-500/60 group-hover:text-white/60 uppercase">Service Client</p>
+                    </div>
+                    <div class="p-6 rounded-[2rem] bg-emerald-50 border border-emerald-100 flex flex-col items-center text-center group hover:bg-emerald-500 transition-all duration-500">
+                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-500 shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h5 class="text-xs font-black uppercase tracking-widest text-emerald-900 group-hover:text-white mb-1">Produits Certifiés</h5>
+                        <p class="text-[10px] font-bold text-emerald-500/60 group-hover:text-white/60 uppercase">Haute Qualité</p>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="p-3">
-                    <i class="fas fa-lock fa-3x mb-3" style="color: #1e5a9e;"></i>
-                    <h5 class="fw-bold">Paiement Sécurisé</h5>
-                    <p class="text-muted">Transactions 100% sécurisées</p>
+        </div>
+
+        <!-- Featured Products -->
+        <div class="mt-20">
+            <div class="flex items-end justify-between mb-10">
+                <div>
+                    <h2 class="text-3xl font-black tracking-tighter text-slate-900 mb-2">Sélection en Vedette</h2>
+                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Nos meilleures recommandations</p>
                 </div>
+                <a href="{{ route('shop') }}" class="text-sm font-black text-primary-500 hover:text-orange-500 transition-colors uppercase tracking-widest flex items-center gap-2">
+                    Voir tout le shop <i class="fas fa-chevron-right text-[10px]"></i>
+                </a>
             </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="p-3">
-                    <i class="fas fa-headset fa-3x mb-3" style="color: #1e5a9e;"></i>
-                    <h5 class="fw-bold">Support 24/7</h5>
-                    <p class="text-muted">Service client disponible</p>
+
+            @if(isset($featuredProducts) && count($featuredProducts) > 0)
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    @foreach($featuredProducts as $product)
+                        <x-product-card :product="$product" />
+                    @endforeach
                 </div>
-            </div>
-            <div class="col-md-3 col-6 mb-4">
-                <div class="p-3">
-                    <i class="fas fa-tag fa-3x mb-3" style="color: #1e5a9e;"></i>
-                    <h5 class="fw-bold">Prix Compétitifs</h5>
-                    <p class="text-muted">Meilleurs prix du marché</p>
+            @else
+                <div class="text-center py-20 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-slate-300 mx-auto mb-6 shadow-sm">
+                        <i class="fas fa-store-slash text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-black text-slate-900 mb-2">Pas de produits en vedette</h4>
+                    <p class="text-slate-400 font-medium">Revenez bientôt pour nos nouveautés !</p>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>
-
 @endsection
 
 
 
-@section('scripts')
-<div id="cart-toast" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; margin-top: 20px; display: none;">
-    <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 8px;">
-        <div class="d-flex">
-            <div class="toast-body fw-bold fs-6">
-                <i class="fas fa-check-circle me-2"></i> Produit ajouté au panier avec succès !
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="document.getElementById('cart-toast').style.display='none'"></button>
-        </div>
-    </div>
-</div>
-
-<script>
-function addToCart(productId) {
-    // Vérifier si connecté
-    const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
-    
-    if (!isAuthenticated) {
-        alert('Veuillez vous connecter pour ajouter des produits au panier');
-        window.location.href = '{{ route("login") }}';
-        return;
-    }
-
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
-    fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            id_produit: productId,
-            quantite: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update the global cart badge if it exists
-            const badge = document.getElementById('cart-badge');
-            if (badge) {
-                badge.textContent = data.cartCount;
-                
-                // Add a small bounce animation to the badge
-                badge.classList.add('animate-bounce');
-                setTimeout(() => badge.classList.remove('animate-bounce'), 500);
-            }
-
-            // Show Jumia-style Green Toast Notification
-            const toastEl = document.getElementById('cart-toast');
-            toastEl.style.display = 'block';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                toastEl.style.display = 'none';
-            }, 3000);
-
-            // Changer le bouton temporairement
-            event.target.innerHTML = '<i class="fas fa-check"></i> Ajouté';
-            event.target.style.background = '#28a745';
-            setTimeout(() => {
-                event.target.innerHTML = 'Ajouter au Panier';
-                event.target.style.background = '#1e5a9e';
-            }, 2000);
-        } else {
-            alert('Erreur: ' + (data.message || 'Impossible d\'ajouter le produit'));
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        alert('Erreur lors de l\'ajout au panier');
-    });
-}
-</script>
-
-<style>
-@keyframes bounce-custom {
-    0%, 100% { transform: translateY(0) translateX(-50%); }
-    50% { transform: translateY(-5px) translateX(-50%); }
-}
-.animate-bounce {
-    animation: bounce-custom 0.5s ease;
-}
-</style>
-@endsection

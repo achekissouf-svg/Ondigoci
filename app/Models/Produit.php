@@ -30,6 +30,17 @@ class Produit extends Model
         return $this->belongsTo(Boutique::class, 'boutique_id');
     }
     
+    public function avis()
+    {
+        return $this->hasMany(AvisProduit::class, 'id_produit', 'id_produit');
+    }
+
+    public function getNoteMoyenneAttribute()
+    {
+        $avg = $this->avis()->avg('note');
+        return $avg ? round($avg, 1) : 0;
+    }
+
     public function prixAvecReduction()
     {
         if ($this->promotion && $this->promotion->date_debut_promo <= now() && $this->promotion->date_fin_promo >= now()) {

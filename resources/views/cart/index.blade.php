@@ -19,70 +19,77 @@
     @endif
 
     <div class="row">
-        @if(count($paniers) > 0)
+        @if($groupedPaniers->count() > 0)
             <div class="col-lg-8 mb-4">
-                <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            @foreach($paniers as $item)
-                            <li class="list-group-item p-4 transition-all" style="transition: background 0.3s;">
-                                <div class="row align-items-center">
-                                    <div class="col-md-2 col-4 text-center">
-                                        @if($item->produit && $item->produit->image_principale_produit)
-                                            <img src="{{ asset('images/' . $item->produit->image_principale_produit) }}" alt="{{ $item->produit->nom_produit }}" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;">
-                                        @else
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px; width: 100%;">
-                                                <i class="fas fa-box text-muted fa-2x"></i>
+                @foreach($groupedPaniers as $boutiqueName => $items)
+                    <div class="card shadow-sm border-0 mb-4" style="border-radius: 12px; overflow: hidden;">
+                        <div class="card-header bg-white border-0 py-3" style="border-bottom: 1px solid #eee !important;">
+                            <h5 class="fw-bold mb-0 text-primary" style="font-size: 1.1rem;">
+                                <i class="fas fa-store me-2"></i> {{ $boutiqueName }}
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                @foreach($items as $item)
+                                <li class="list-group-item p-4 transition-all" style="transition: background 0.3s;">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 col-4 text-center">
+                                            @if($item->produit && $item->produit->image_principale_produit)
+                                                <img src="{{ asset('images/' . $item->produit->image_principale_produit) }}" alt="{{ $item->produit->nom_produit }}" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;">
+                                            @else
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px; width: 100%;">
+                                                    <i class="fas fa-box text-muted fa-2x"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="col-md-5 col-8 mb-2 mb-md-0">
+                                            <h5 class="fw-bold mb-1" style="color: #333; font-size: 1rem;">{{ $item->produit->nom_produit ?? 'Produit Introuvable' }}</h5>
+                                            @if($item->produit && $item->produit->prixAvecReduction() < $item->produit->prix_unitaire_produit)
+                                                <p class="mb-0 text-muted" style="font-size: 0.85rem;">
+                                                    <del>{{ number_format($item->produit->prix_unitaire_produit, 0, ',', ' ') }} FCFA</del>
+                                                    <span class="text-danger fw-bold ms-2">{{ number_format($item->produit->prixAvecReduction(), 0, ',', ' ') }} FCFA</span>
+                                                </p>
+                                            @else
+                                                <p class="mb-0 text-primary fw-bold" style="font-size: 0.95rem;">{{ number_format($item->produit->prix_unitaire_produit ?? 0, 0, ',', ' ') }} FCFA</p>
+                                            @endif
+                                        </div>
+                                        <div class="col-md-3 col-6 text-center">
+                                            <div class="d-inline-flex align-items-center bg-light border rounded px-3 py-1">
+                                                <form action="{{ route('cart.update', $item->id_panier) }}" method="POST" class="d-inline">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="action" value="decrease">
+                                                    <button type="submit" class="btn btn-sm btn-link text-decoration-none p-0 me-2" title="Retirer une unité">
+                                                        <i class="fas fa-minus-circle text-muted"></i>
+                                                    </button>
+                                                </form>
+                                                
+                                                <span class="fw-bold fs-6">{{ $item->quantite }}</span>
+                                                
+                                                <form action="{{ route('cart.update', $item->id_panier) }}" method="POST" class="d-inline">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="action" value="increase">
+                                                    <button type="submit" class="btn btn-sm btn-link text-decoration-none p-0 ms-2" title="Ajouter une unité">
+                                                        <i class="fas fa-plus-circle text-muted"></i>
+                                                    </button>
+                                                </form>
                                             </div>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-5 col-8 mb-2 mb-md-0">
-                                        <h5 class="fw-bold mb-1" style="color: #333;">{{ $item->produit->nom_produit ?? 'Produit Introuvable' }}</h5>
-                                        @if($item->produit && $item->produit->prixAvecReduction() < $item->produit->prix_unitaire_produit)
-                                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">
-                                                <del>{{ number_format($item->produit->prix_unitaire_produit, 0, ',', ' ') }} FCFA</del><br>
-                                                <span class="text-success fw-bold">{{ number_format($item->produit->prixAvecReduction(), 0, ',', ' ') }} FCFA</span>
-                                            </p>
-                                        @else
-                                            <p class="mb-0 text-muted fw-bold">{{ number_format($item->produit->prix_unitaire_produit ?? 0, 0, ',', ' ') }} FCFA</p>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-3 col-6 text-center">
-                                        <div class="d-inline-flex align-items-center bg-light border rounded px-3 py-1">
-                                            <form action="{{ route('cart.update', $item->id_panier) }}" method="POST" class="d-inline">
-                                                @csrf @method('PATCH')
-                                                <input type="hidden" name="action" value="decrease">
-                                                <button type="submit" class="btn btn-sm btn-link text-decoration-none p-0 me-2" title="Retirer une unité">
-                                                    <i class="fas fa-minus-circle text-muted"></i>
-                                                </button>
-                                            </form>
-                                            
-                                            <span class="fw-bold fs-5">{{ $item->quantite }}</span>
-                                            
-                                            <form action="{{ route('cart.update', $item->id_panier) }}" method="POST" class="d-inline">
-                                                @csrf @method('PATCH')
-                                                <input type="hidden" name="action" value="increase">
-                                                <button type="submit" class="btn btn-sm btn-link text-decoration-none p-0 ms-2" title="Ajouter une unité">
-                                                    <i class="fas fa-plus-circle text-muted"></i>
+                                        </div>
+                                        <div class="col-md-2 col-6 text-end">
+                                            <form action="{{ route('cart.destroy', $item->id_panier) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger btn-sm border-0 shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" title="Tout retirer" style="width: 35px; height: 35px;" onclick="return confirm('Retirer cet article du panier ?')">
+                                                    <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
                                                 </button>
                                             </form>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 col-6 text-end">
-                                        <form action="{{ route('cart.destroy', $item->id_panier) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm border-0 shadow-sm rounded-circle d-inline-flex align-items-center justify-content-center" title="Tout retirer" style="width: 40px; height: 40px;" onclick="return confirm('Retirer cet article du panier ?')">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </li>
-                            @endforeach
-                        </ul>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
-                </div>
+                @endforeach
             </div>
             
             <!-- Summary Card -->
@@ -92,16 +99,16 @@
                         <h4 class="fw-bold border-bottom pb-3 mb-4">Résumé de la commande</h4>
                         
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Sous-total ({{ $paniers->sum('quantite') }} articles)</span>
+                            <span class="text-muted">Sous-total ({{ $groupedPaniers->flatten()->sum('quantite') }} articles)</span>
                             <span class="fw-bold">{{ number_format($total, 0, ',', ' ') }} FCFA</span>
                         </div>
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-muted">Frais de livraison</span>
-                            <span class="text-success fw-bold">Calculés à l'étape suivante</span>
+                            <span class="text-success fw-bold small text-end">Gérés par chaque boutique</span>
                         </div>
                         
                         <div class="border-top pt-3 d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Total</h5>
+                            <h5 class="fw-bold mb-0">Total estimé</h5>
                             <h4 class="fw-bold text-primary mb-0" style="color: #ff6b35 !important;">{{ number_format($total, 0, ',', ' ') }} FCFA</h4>
                         </div>
                         

@@ -32,9 +32,20 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user = $request->user();
+        $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        // Update WhatsApp if user has a boutique
+        if ($request->has('whatsapp_boutique') && $user->boutique) {
+            $user->boutique->update(['whatsapp' => $request->whatsapp_boutique]);
+        }
+
+        // Redirect based on role to fulfill the "must go back" request
+        $route = 'home';
+        if ($user->role === 'admin') $route = 'admin.dashboard';
+        elseif ($user->role === 'boutique') $route = 'boutique.dashboard';
+
+        return Redirect::route($route)->with('success', 'Votre profil a été mis à jour avec succès !');
     }
 
     /**

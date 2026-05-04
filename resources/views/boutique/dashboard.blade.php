@@ -11,8 +11,8 @@
         </div>
         @if($boutique)
             <div class="col-md-4 text-md-end">
-                <a href="{{ route('magasin.show', $boutique->id) }}" class="btn btn-primary shadow-sm" target="_blank">
-                    <i class="fas fa-external-link-alt me-2"></i> Voir ma boutique
+                <a href="{{ route('magasin.show', $boutique->id) }}" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-eye me-2"></i> Voir ma boutique
                 </a>
             </div>
         @endif
@@ -101,19 +101,24 @@
         <!-- Raccourcis Rapides -->
         <h4 class="fw-bold mb-3">Accès Rapides</h4>
         <div class="row mb-5 g-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <a href="{{ route('boutique.produits.index') }}" class="btn btn-outline-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 12px; background: white;">
                     <i class="fas fa-box"></i> Gérer mes produits
                 </a>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <a href="{{ route('boutique.commandes.index') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 12px; background: white; border-color: #9b59b6; color: #9b59b6;">
                     <i class="fas fa-receipt"></i> Voir toutes mes commandes
                 </a>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <a href="{{ route('boutique.promotions.index') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 12px; background: white; border-color: #e74c3c; color: #e74c3c;">
                     <i class="fas fa-tags"></i> Mes Promotions
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ route('boutique.avis.index') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 12px; background: white; border-color: #f1c40f; color: #f39c12;">
+                    <i class="fas fa-star"></i> Avis Clients
                 </a>
             </div>
         </div>
