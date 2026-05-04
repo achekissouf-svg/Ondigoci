@@ -33,6 +33,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" style="border-left: 5px solid #dc3545;">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     @if($boutique && $boutique->aAtteintLimiteProduits())
         <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-4" style="border-left: 5px solid #ffc107; background-color: #fff8e1;">
             <div class="d-flex align-items-center">

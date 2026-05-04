@@ -23,11 +23,15 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Boutique
 Route::get('/shop', [ProduitController::class, 'index'])->name('shop');
+Route::get('/search/suggestions', [ProduitController::class, 'suggestions'])->name('search.suggestions');
 Route::get('/produit/{id}', [ProduitController::class, 'show'])->name('produit.show');
 Route::get('/magasin/{id}', [\App\Http\Controllers\PublicBoutiqueController::class, 'show'])->name('magasin.show');
 Route::post('/magasin/{id}/avis', [\App\Http\Controllers\PublicBoutiqueController::class, 'storeAvis'])
     ->middleware('auth')
     ->name('magasin.avis.store');
+Route::post('/produit/{id}/avis', [\App\Http\Controllers\ProduitController::class, 'storeAvis'])
+    ->middleware('auth')
+    ->name('produit.avis.store');
 
 // Routes d'authentification (gérées par Breeze)
 require __DIR__.'/auth.php';
@@ -40,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/cart/{id}', [PanierController::class, 'destroy'])->name('cart.destroy');
     Route::post('/checkout', [CommandeController::class, 'store'])->name('checkout');
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return redirect()->route('home');
     })->name('dashboard');
 
     // Client Commandes Routes
@@ -54,6 +58,11 @@ Route::middleware(['auth'])->group(function () {
     // Boutique Registration (for clients)
     Route::get('/become-seller', [BoutiqueRegistrationController::class, 'create'])->name('boutique.register');
     Route::post('/become-seller', [BoutiqueRegistrationController::class, 'store'])->name('boutique.register.store');
+
+    // Profile Routes
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Admin Routes
@@ -81,6 +90,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Admin Commandes (orders for admin's products)
     Route::get('/commandes', [AdminCommandeController::class, 'index'])->name('admin.commandes.index');
     Route::patch('/commandes/{id}/status', [AdminCommandeController::class, 'update'])->name('admin.commandes.update');
+    
+    // Manage Avis (Admin moderation)
+    Route::get('/avis', [\App\Http\Controllers\Admin\AvisController::class, 'index'])->name('admin.avis.index');
+    Route::delete('/avis/boutique/{id}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyBoutiqueAvis'])->name('admin.avis.boutique.destroy');
+    Route::delete('/avis/produit/{id}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyProduitAvis'])->name('admin.avis.produit.destroy');
 });
 
 // Boutique Routes (Vendeurs)
@@ -93,6 +107,8 @@ Route::prefix('boutique')->middleware(['auth', 'boutique'])->group(function () {
     Route::patch('/commandes/{id}/status', [BoutiqueCommandeController::class, 'update'])->name('boutique.commandes.update');
     // Boutique Promotions
     Route::resource('promotions', BoutiquePromotionController::class)->names('boutique.promotions');
+    // Boutique Avis
+    Route::get('/avis', [\App\Http\Controllers\Boutique\AvisController::class, 'index'])->name('boutique.avis.index');
 });
 
 Route::get('/boutique/pending', function () {

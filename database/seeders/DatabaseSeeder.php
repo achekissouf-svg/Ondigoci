@@ -25,9 +25,9 @@ class DatabaseSeeder extends Seeder
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
         // 0. Create Payment Modes (Global dependencies)
-        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP001', 'libelle_mode_paiement' => 'Cash à la livraison']);
-        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP002', 'libelle_mode_paiement' => 'Orange Money']);
-        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP003', 'libelle_mode_paiement' => 'MTN Mobile Money']);
+        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP001', 'libel_mode_paiement' => 'Cash à la livraison']);
+        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP002', 'libel_mode_paiement' => 'Orange Money']);
+        \App\Models\ModePaiement::create(['id_mode_paiement' => 'MP003', 'libel_mode_paiement' => 'MTN Mobile Money']);
 
         // 1. Create Categories
         $categories = [

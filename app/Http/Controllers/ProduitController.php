@@ -13,6 +13,12 @@ class ProduitController extends Controller
      */
     public function index(Request $request)
     {
+        if (auth()->check() && auth()->user()->role !== 'client' && !$request->has('preview')) {
+            return auth()->user()->role === 'admin' 
+                ? redirect()->route('admin.dashboard') 
+                : redirect()->route('boutique.dashboard');
+        }
+
         $query = $request->input('q');
         
         // Get products with search
@@ -61,6 +67,12 @@ class ProduitController extends Controller
      */
     public function show($id)
     {
+        if (auth()->check() && auth()->user()->role !== 'client' && !request()->has('preview')) {
+            return auth()->user()->role === 'admin' 
+                ? redirect()->route('admin.dashboard') 
+                : redirect()->route('boutique.dashboard');
+        }
+
         $produit = Produit::with(['categorie', 'boutique'])->where('id_produit', $id)->firstOrFail();
         
         // Suggest other products from the same boutique or category
@@ -94,8 +106,56 @@ class ProduitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produit $produit)
+    public function storeAvis(Request $request, $id)
     {
-        //
+        $request->validate([
+            'note' => 'required|integer|min:1|max:5',
+            'commentaire' => 'nullable|string|max:500',
+        ]);
+
+        $hasBought = \App\Models\LigneCommande::whereHas('commande', function($q) {
+                $q->where('user_id', auth()->id())
+                  ->where('statut_commande', 'livree');
+            })
+            ->where('id_produit', $id)
+            ->exists();
+
+        if (!$hasBought) {
+            return back()->with('error', 'Désolé, vous devez avoir déjà acheté et reçu ce produit pour pouvoir laisser un avis.');
+        }
+
+        \App\Models\AvisProduit::create([
+            'id_produit' => $id,
+            'user_id' => auth()->id(),
+            'note' => $request->note,
+            'commentaire' => $request->commentaire,
+        ]);
+
+        return back()->with('success', 'Votre avis sur ce produit a été enregistré.');
+    }
+
+    public function suggestions(Request $request)
+    {
+        $query = $request->input('q');
+        if (!$query || strlen($query) < 2) return response()->json([]);
+
+        $produits = Produit::where('nom_produit', 'LIKE', "%{$query}%")
+            ->whereHas('boutique', function($q) {
+                $q->where('statut', 'approuve');
+            })
+            ->limit(5)
+            ->get();
+
+        $results = $produits->map(function($p) {
+            return [
+                'id' => $p->id_produit ?? $p->id,
+                'name' => $p->nom_produit,
+                'price' => number_format($p->prix_unitaire_produit, 0, ',', ' ') . ' FCFA',
+                'image' => asset('images/' . $p->image_principale_produit),
+                'url' => route('produit.show', $p->id_produit ?? $p->id)
+            ];
+        });
+
+        return response()->json($results);
     }
 }

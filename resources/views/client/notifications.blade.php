@@ -20,17 +20,19 @@
                                 <div class="col-auto">
                                     <div style="width: 50px; height: 50px; border-radius: 50%; background-color: 
                                         @if($notif->statut_commande === 'en_attente') #ffc107
-                                        @elseif($notif->statut_commande === 'encours') #17a2b8
-                                        @elseif($notif->statut_commande === 'livré') #28a745
-                                        @elseif($notif->statut_commande === 'rejeté') #dc3545
+                                        @elseif($notif->statut_commande === 'en_preparation') #cfe2ff
+                                        @elseif($notif->statut_commande === 'en_livraison') #17a2b8
+                                        @elseif($notif->statut_commande === 'livree' || $notif->statut_commande === 'livré') #28a745
+                                        @elseif($notif->statut_commande === 'rejetee' || $notif->statut_commande === 'rejeté') #dc3545
                                         @else #6c757d
                                         @endif
                                     ; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;">
                                         <i class="fas 
                                             @if($notif->statut_commande === 'en_attente') fa-hourglass
-                                            @elseif($notif->statut_commande === 'encours') fa-truck
-                                            @elseif($notif->statut_commande === 'livré') fa-check-circle
-                                            @elseif($notif->statut_commande === 'rejeté') fa-times-circle
+                                            @elseif($notif->statut_commande === 'en_preparation') fa-box-open
+                                            @elseif($notif->statut_commande === 'en_livraison') fa-truck
+                                            @elseif($notif->statut_commande === 'livree' || $notif->statut_commande === 'livré') fa-check-circle
+                                            @elseif($notif->statut_commande === 'rejetee' || $notif->statut_commande === 'rejeté') fa-times-circle
                                             @else fa-question-circle
                                             @endif
                                         "></i>
@@ -49,6 +51,11 @@
                                         | <a href="{{ route('client.commandes.tracking', $notif->commande) }}" class="text-primary text-decoration-none">
                                             Voir le suivi de #{{ $notif->commande->num_commande }}
                                         </a>
+                                        @if(($notif->statut_commande === 'livree' || $notif->statut_commande === 'livré') && $notif->commande && $notif->commande->boutique_id)
+                                            | <a href="{{ route('magasin.show', $notif->commande->boutique_id) }}" class="text-warning fw-bold text-decoration-none">
+                                                <i class="fas fa-star"></i> Laisser un avis
+                                            </a>
+                                        @endif
                                     </small>
                                 </div>
                                 @if(!$notif->lue)

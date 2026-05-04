@@ -183,16 +183,18 @@
             </div>
             
             <div class="ms-md-4 mt-4 mt-md-0">
-                @if($boutique->whatsapp)
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $boutique->whatsapp) }}" target="_blank" class="whatsapp-btn">
-                        <i class="fab fa-whatsapp fs-5"></i>
-                        Contacter sur WhatsApp
-                    </a>
-                @elseif($boutique->user->telephone)
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $boutique->user->telephone) }}" target="_blank" class="whatsapp-btn">
-                        <i class="fab fa-whatsapp fs-5"></i>
-                        Contacter sur WhatsApp
-                    </a>
+                @if($boutique->user_id !== auth()->id())
+                    @if($boutique->whatsapp)
+                        <a href="https://api.whatsapp.com/send?phone={{ preg_replace('/[^0-9]/', '', $boutique->whatsapp) }}&text=Bonjour {{ $boutique->nom_boutique }}, j'aimerais discuter avec vous." class="whatsapp-btn">
+                            <i class="fab fa-whatsapp fs-5"></i>
+                            Contacter sur WhatsApp
+                        </a>
+                    @elseif($boutique->user->telephone)
+                        <a href="https://api.whatsapp.com/send?phone={{ preg_replace('/[^0-9]/', '', $boutique->user->telephone) }}&text=Bonjour {{ $boutique->nom_boutique }}, j'aimerais discuter avec vous." class="whatsapp-btn">
+                            <i class="fab fa-whatsapp fs-5"></i>
+                            Contacter sur WhatsApp
+                        </a>
+                    @endif
                 @endif
             </div>
         </div>
@@ -207,39 +209,7 @@
     <div class="row g-4 mb-5">
         @forelse($produits as $produit)
             <div class="col-6 col-md-4 col-lg-3">
-                <div class="product-card">
-                    <a href="{{ route('produit.show', $produit->id_produit) }}" class="text-decoration-none">
-                        <div class="product-img-wrapper">
-                            @if($produit->image_principale_produit)
-                                <img src="{{ asset('images/' . $produit->image_principale_produit) }}" class="product-img" alt="{{ $produit->nom_produit }}">
-                            @else
-                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light position-absolute top-0">
-                                    <i class="fas fa-box fa-3x text-muted"></i>
-                                </div>
-                            @endif
-                            
-                            @if($produit->id_promo)
-                                <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill">Promo</span>
-                            @endif
-                        </div>
-                        <div class="card-body p-3">
-                            <h5 class="card-title text-dark fs-6 text-truncate mb-2">{{ $produit->nom_produit }}</h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">{{ number_format($produit->prixAvecReduction(), 0, ',', ' ') }} FCFA</span>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="card-footer bg-white border-0 px-3 pb-3 pt-0">
-                        <form action="{{ route('cart.add') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="produit_id" value="{{ $produit->id_produit }}">
-                            <input type="hidden" name="quantite" value="1">
-                            <button type="submit" class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
-                                <i class="fas fa-cart-plus me-1"></i> Ajouter
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                <x-product-card :product="$produit" />
             </div>
         @empty
             <div class="col-12 text-center py-5">
@@ -295,24 +265,38 @@
                     <h5 class="fw-bold mb-3">Laisser un avis</h5>
                     @auth
                         @if($boutique->user_id !== auth()->id())
-                            <form action="{{ route('magasin.avis.store', $boutique->id) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Votre Note</label>
-                                    <select name="note" class="form-select border-0 shadow-sm" required>
-                                        <option value="5">⭐⭐⭐⭐⭐ (5/5) - Excellent</option>
-                                        <option value="4">⭐⭐⭐⭐ (4/5) - Très bon</option>
-                                        <option value="3">⭐⭐⭐ (3/5) - Moyen</option>
-                                        <option value="2">⭐⭐ (2/5) - Décevant</option>
-                                        <option value="1">⭐ (1/5) - Mauvais</option>
-                                    </select>
+                            @php
+                                $hasPurchased = \App\Models\Commande::where('user_id', auth()->id())
+                                    ->where('boutique_id', $boutique->id)
+                                    ->where('statut_commande', 'livree')
+                                    ->exists();
+                            @endphp
+
+                            @if($hasPurchased)
+                                <form action="{{ route('magasin.avis.store', $boutique->id) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Votre Note</label>
+                                        <select name="note" class="form-select border-0 shadow-sm" required>
+                                            <option value="5">⭐⭐⭐⭐⭐ (5/5) - Excellent</option>
+                                            <option value="4">⭐⭐⭐⭐ (4/5) - Très bon</option>
+                                            <option value="3">⭐⭐⭐ (3/5) - Moyen</option>
+                                            <option value="2">⭐⭐ (2/5) - Décevant</option>
+                                            <option value="1">⭐ (1/5) - Mauvais</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Commentaire</label>
+                                        <textarea name="commentaire" rows="4" class="form-control border-0 shadow-sm" placeholder="Partagez votre expérience..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 8px;">Envoyer mon avis</button>
+                                </form>
+                            @else
+                                <div class="alert alert-light border-0 shadow-sm p-3">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    Seuls les clients ayant déjà reçu une commande de cette boutique peuvent laisser un avis.
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Commentaire</label>
-                                    <textarea name="commentaire" rows="4" class="form-control border-0 shadow-sm" placeholder="Partagez votre expérience..."></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 8px;">Envoyer mon avis</button>
-                            </form>
+                            @endif
                         @else
                             <div class="alert alert-info border-0">Vous ne pouvez pas noter votre propre boutique.</div>
                         @endif

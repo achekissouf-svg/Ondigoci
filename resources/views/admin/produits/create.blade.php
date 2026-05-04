@@ -1,71 +1,84 @@
-@extends('layouts.app')
-@section('title', 'Nouveau Produit - Admin')
-@section('content')
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="d-flex align-items-center gap-3 mb-4">
-                <a href="{{ route('admin.produits.index') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left"></i></a>
-                <h1 class="fw-bold mb-0" style="color: #1e5a9e;">Nouveau Produit</h1>
-            </div>
+@extends('layouts.admin')
 
-            <div class="card shadow-sm border-0" style="border-radius: 16px;">
-                <div class="card-body p-5">
-                    <form action="{{ route('admin.produits.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row g-4">
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Nom du produit</label>
-                                <input type="text" name="nom_produit" class="form-control @error('nom_produit') is-invalid @enderror" 
-                                       placeholder="Ex: iPhone 15 Pro Max" value="{{ old('nom_produit') }}">
-                                @error('nom_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Description</label>
-                                <textarea name="description_produit" rows="3" class="form-control @error('description_produit') is-invalid @enderror" 
-                                          placeholder="Décrivez votre produit...">{{ old('description_produit') }}</textarea>
-                                @error('description_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Prix (FCFA)</label>
-                                <input type="number" name="prix_unitaire_produit" class="form-control @error('prix_unitaire_produit') is-invalid @enderror" 
-                                       placeholder="Ex: 150000" value="{{ old('prix_unitaire_produit') }}" min="0">
-                                @error('prix_unitaire_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Stock disponible</label>
-                                <input type="number" name="stock_disponible_produit" class="form-control @error('stock_disponible_produit') is-invalid @enderror" 
-                                       placeholder="Ex: 10" value="{{ old('stock_disponible_produit') }}" min="0">
-                                @error('stock_disponible_produit')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Catégorie</label>
-                                <select name="id_categorie" class="form-select @error('id_categorie') is-invalid @enderror">
-                                    <option value="">-- Choisir une catégorie --</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id_categorie }}" {{ old('id_categorie') == $cat->id_categorie ? 'selected' : '' }}>
-                                            {{ $cat->libel_categorie }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('id_categorie')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Image du produit</label>
-                                <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
-                                @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-                        </div>
-                        <div class="d-flex gap-3 mt-5">
-                            <button type="submit" class="btn fw-bold text-white px-5" style="background: #1e5a9e; border-radius: 8px;">
-                                <i class="fas fa-save me-2"></i> Publier le produit
-                            </button>
-                            <a href="{{ route('admin.produits.index') }}" class="btn btn-outline-secondary px-4" style="border-radius: 8px;">Annuler</a>
-                        </div>
-                    </form>
+@section('header_title', 'Ajouter un Produit')
+
+@section('content')
+<div class="max-w-4xl">
+    <div class="mb-8 flex items-center gap-4">
+        <a href="{{ route('admin.produits.index') }}" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white border border-slate-200 text-slate-500 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+            <h2 class="text-xl font-bold text-slate-800">Nouveau Produit Ondigoci</h2>
+            <p class="text-sm text-slate-500">Remplissez les informations ci-dessous pour publier un nouveau produit.</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <form action="{{ route('admin.produits.store') }}" method="POST" enctype="multipart/form-data" class="p-8">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Nom du produit</label>
+                    <input type="text" name="nom_produit" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none @error('nom_produit') border-red-500 @enderror" 
+                           placeholder="Ex: iPhone 15 Pro Max" value="{{ old('nom_produit') }}">
+                    @error('nom_produit')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Description détaillée</label>
+                    <textarea name="description_produit" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none @error('description_produit') border-red-500 @enderror" 
+                              placeholder="Décrivez votre produit avec précision...">{{ old('description_produit') }}</textarea>
+                    @error('description_produit')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Prix de vente (FCFA)</label>
+                    <div class="relative">
+                        <input type="number" name="prix_unitaire_produit" class="w-full pl-4 pr-16 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none @error('prix_unitaire_produit') border-red-500 @enderror" 
+                               placeholder="Ex: 150000" value="{{ old('prix_unitaire_produit') }}" min="0">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">FCFA</span>
+                    </div>
+                    @error('prix_unitaire_produit')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Stock disponible</label>
+                    <input type="number" name="stock_disponible_produit" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none @error('stock_disponible_produit') border-red-500 @enderror" 
+                           placeholder="Ex: 10" value="{{ old('stock_disponible_produit') }}" min="0">
+                    @error('stock_disponible_produit')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Catégorie</label>
+                    <select name="id_categorie" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none bg-white @error('id_categorie') border-red-500 @enderror">
+                        <option value="">-- Choisir --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id_categorie }}" {{ old('id_categorie') == $cat->id_categorie ? 'selected' : '' }}>
+                                {{ $cat->libel_categorie }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('id_categorie')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-tight">Image principale</label>
+                    <input type="file" name="image" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 transition-all outline-none @error('image') border-red-500 @enderror" accept="image/*">
+                    @error('image')<p class="mt-1 text-xs text-red-500 font-bold">{{ $message }}</p>@enderror
                 </div>
             </div>
-        </div>
+
+            <div class="flex items-center gap-4 mt-10 pt-8 border-t border-slate-100">
+                <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-slate-900 hover:bg-primary-600 text-white font-bold transition-all shadow-lg shadow-slate-900/10 hover:shadow-primary-500/20">
+                    <i class="fas fa-save"></i> Enregistrer le produit
+                </button>
+                <a href="{{ route('admin.produits.index') }}" class="px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all">
+                    Annuler
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
+

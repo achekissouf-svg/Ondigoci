@@ -20,9 +20,10 @@ class CommandeController extends Controller
             return view('boutique.commandes', ['lignes' => collect(), 'boutique' => null]);
         }
 
-        // Get all order lines for this boutique's products
+        // Get all order lines for this boutique's sub-orders
+        // Since we split orders by boutique, we can filter directly by boutique_id
         $lignes = LigneCommande::with(['produit', 'commande.user'])
-            ->whereHas('produit', function ($q) use ($boutique) {
+            ->whereHas('commande', function ($q) use ($boutique) {
                 $q->where('boutique_id', $boutique->id);
             })
             ->orderByDesc('created_at')
@@ -77,8 +78,8 @@ class CommandeController extends Controller
                 'message' => 'Votre commande est en route pour la livraison à domicile.'
             ],
             'livree' => [
-                'titre' => 'Commande livrée',
-                'message' => 'Félicitations ! Votre commande a été livrée avec succès.'
+                'titre' => 'Commande livrée 🎉',
+                'message' => 'Félicitations ! Votre commande a été livrée avec succès. Qu\'avez-vous pensé de vos articles ? Laissez-nous un avis !'
             ],
             'rejetee' => [
                 'titre' => 'Commande rejetée',

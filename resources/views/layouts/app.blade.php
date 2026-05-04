@@ -9,6 +9,34 @@
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#1e5a9e',
+                            600: '#164e85',
+                            900: '#0f3a63',
+                        },
+                        orange: {
+                            50: '#fff7ed',
+                            400: '#fb923c',
+                            500: '#ff6b35',
+                            600: '#e55a28',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -19,226 +47,71 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f8fafc;
         }
 
-        /* Header Top - White section with logo and search */
-        .header-top {
-            background-color: #fff;
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
         }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            font-size: 28px;
-            font-weight: 700;
-            color: #1e5a9e;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
-        .logo-icon {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        /* Bootstrap Overrides for compatibility */
+        .btn-primary {
+            background-color: #1e5a9e;
+            border-color: #1e5a9e;
+        }
+        .btn-primary:hover {
+            background-color: #164e85;
+            border-color: #164e85;
+        }
+        .text-primary { color: #1e5a9e !important; }
+        .bg-primary { background-color: #1e5a9e !important; }
+        
+        /* Glassmorphism Classes */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .search-bar-container {
-            position: relative;
-            flex: 1;
-            max-width: 500px;
+        /* Fix for sticky header shadow */
+        .header-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            transition: all 0.3s ease;
         }
-
-        .search-bar-container input {
-            width: 100%;
-            padding: 12px 50px 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .search-bar-container input:focus {
-            border-color: #ff6b35;
-        }
-
-        .search-bar-container button {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #ff6b35;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .search-bar-container button:hover {
-            background: #e55a28;
-        }
-
-        .auth-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .auth-section a {
-            color: #1e5a9e;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .auth-section a:hover {
-            color: #ff6b35;
-        }
-
-        /* Navigation Bar - Blue section */
-        .navbar-main {
-            background: linear-gradient(135deg, #1e5a9e, #2d6db5);
-            padding: 0;
-        }
-
-        .navbar-main .navbar-nav .nav-link {
-            color: white !important;
-            padding: 15px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-
-        .navbar-main .navbar-nav .nav-link:hover,
-        .navbar-main .navbar-nav .nav-link.active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .navbar-main .navbar-nav .nav-link.home-btn {
-            background: #ff6b35;
-        }
-
-        .navbar-main .navbar-nav .nav-link.home-btn:hover {
-            background: #e55a28;
-        }
-
-        /* Dropdown styling */
-        .navbar-main .dropdown-menu {
-            background: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .navbar-main .dropdown-item {
-            color: #333;
-            padding: 10px 20px;
-        }
-
-        .navbar-main .dropdown-item:hover {
-            background: #f5f5f5;
-            color: #1e5a9e;
-        }
-
-        /* Card hover effects */
-        .card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-        }
-
-        /* Footer */
-        .footer-main {
-            background: linear-gradient(135deg, #1a4d7e, #1e5a9e);
-            color: white;
-            padding: 50px 0 20px;
-            margin-top: 60px;
-        }
-
-        .footer-main h5 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .footer-main a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-main a:hover {
-            color: #ff6b35;
-        }
-
-        .footer-main .contact-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .footer-main .contact-info i {
-            color: #ff6b35;
-            font-size: 18px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .social-links a {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .social-links a:hover {
-            background: #ff6b35;
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
-            margin-top: 30px;
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .logo-section {
-                font-size: 22px;
+        /* Dropdown Hover Effect */
+        @media (min-width: 1024px) {
+            .dropdown:hover > .dropdown-menu {
+                display: block;
+                margin-top: 0;
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
             }
-            
-            .search-bar-container {
-                max-width: 100%;
-                margin: 10px 0;
-            }
-            
-            .navbar-main .navbar-nav .nav-link {
-                padding: 10px 15px;
+            .dropdown-menu {
+                display: block;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(10px);
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
         }
     </style>
@@ -246,143 +119,170 @@
     @yield('styles')
 </head>
 <body>
-    <!-- Header Top Section -->
-    <div class="header-top">
-        <div class="container">
-            <div class="row align-items-center g-3">
-                <div class="col-lg-3 col-md-12">
-                    <a href="{{ url('/') }}" class="logo-section">
-                        <div class="logo-icon">
-                            <i class="fas fa-handshake"></i>
-                        </div>
-                        <span>ndigoci</span>
-                    </a>
-                </div>
-                
-                <div class="col-lg-6 col-md-8">
-                    <form class="search-bar-container" id="searchForm" action="{{ route('shop') }}" method="GET" onsubmit="handleSearch(event)">
-                        <input type="text" id="searchInput" name="q" placeholder="Rechercher des produits ou catégories..." autocomplete="off">
-                        <button type="submit"><i class="fas fa-search"></i></button>
+    <!-- Top Announcement Bar -->
+    @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
+    <div class="bg-primary-900 text-white py-2 text-[10px] font-black uppercase tracking-[0.2em] text-center hidden md:block">
+        Livraison gratuite à partir de 50 000 FCFA • Support client 24/7
+    </div>
+    @endif
+
+    <!-- Main Header & Navigation -->
+    <header class="header-sticky glass-header">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20 gap-8">
+                <!-- Logo -->
+                <a href="{{ auth()->check() && auth()->user()->role !== 'client' ? (auth()->user()->role === 'admin' ? route('admin.dashboard') : route('boutique.dashboard')) : url('/') }}" class="flex items-center gap-2 group min-w-fit">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-primary-500">Ondigoci</span>
+                </a>
+
+                <!-- Search Bar -->
+                @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
+                <div class="flex-1 max-w-2xl hidden lg:block text-center relative" id="searchContainer">
+                    <form action="{{ route('shop') }}" method="GET" class="relative group inline-block w-full">
+                        <input type="text" name="q" id="instantSearch" placeholder="Rechercher un produit, une catégorie..." autocomplete="off"
+                               class="w-full h-12 bg-slate-100 border-none rounded-2xl px-6 pr-14 text-sm font-medium focus:ring-2 focus:ring-orange-500 transition-all outline-none shadow-inner">
+                        <button type="submit" class="absolute right-2 top-1.5 w-9 h-9 bg-orange-500 text-white rounded-xl flex items-center justify-center hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/30">
+                            <i class="fas fa-search text-sm"></i>
+                        </button>
                     </form>
+                    <!-- Instant Search Results -->
+                    <div id="searchResults" class="absolute top-full left-0 right-0 bg-white mt-2 rounded-[1.5rem] shadow-2xl border border-slate-100 overflow-hidden hidden z-[60]">
+                        <div id="resultsContent" class="p-2"></div>
+                        <div class="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                            <a href="#" id="viewAllResults" class="text-xs font-bold text-primary-500 hover:text-primary-600">Voir tous les résultats</a>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="col-lg-3 col-md-4">
-                    <div class="auth-section justify-content-end align-items-center">
-                        @auth
-                            <a href="{{ route('cart.index') }}" class="position-relative me-4" style="color: #1e5a9e; font-size: 1.3rem; transition: color 0.3s;" onmouseover="this.style.color='#ff6b35'" onmouseout="this.style.color='#1e5a9e'">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span id="cart-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
-                                    {{ Auth::user()->paniers()->sum('quantite') ?: 0 }}
-                                </span>
-                            </a>
-                            <i class="fas fa-user ms-2"></i>
-                            <span>{{ Auth::user()->name }}</span>
-                        @else
-                            <i class="fas fa-user"></i>
-                            <span>Compte</span>
-                            <a href="{{ route('login') }}">Connexion</a>
-                            <span>/</span>
-                            <a href="{{ route('register') }}">Inscription</a>
-                        @endauth
+                @else
+                <div class="flex-1 flex items-center justify-center">
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300">Interface Vendeur Professionnelle</span>
+                </div>
+                @endif
+
+                <!-- Actions -->
+                <div class="flex items-center gap-4">
+                    @auth
+                        @if(Auth::user()->role === 'client' || request()->has('preview'))
+                        <!-- Cart -->
+                        <a href="{{ route('cart.index') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group">
+                            <i class="fas fa-shopping-cart text-lg"></i>
+                            <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
+                                {{ Auth::user()->paniers()->sum('quantite') ?: 0 }}
+                            </span>
+                        </a>
+
+                        <a href="{{ route('client.notifications') }}" class="relative p-2.5 bg-slate-100 rounded-2xl text-slate-600 hover:text-primary-500 transition-colors group">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span id="notificationBadge" class="absolute top-2.5 right-2.5 w-2 h-2 bg-orange-500 rounded-full border-2 border-white" style="display: none;"></span>
+                        </a>
+                        @endif
+
+                        <!-- User Profile Dropdown -->
+                        <div class="dropdown">
+                            <button class="flex items-center gap-2 p-1.5 pr-4 bg-slate-100 rounded-2xl hover:bg-slate-200 transition-colors border-0" data-bs-toggle="dropdown">
+                                <div class="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center text-white font-black text-sm uppercase">
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                </div>
+                                <div class="text-left hidden sm:block">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Mon Compte</p>
+                                    <p class="text-xs font-bold text-slate-700 leading-none">{{ Str::limit(Auth::user()->name, 10) }}</p>
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-2xl rounded-[1.5rem] p-2 mt-2">
+                                <li>
+                                    @if(Auth::user()->role === 'admin')
+                                        <a class="dropdown-item rounded-xl py-2.5 font-bold text-primary-500 bg-primary-50 mb-1" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-pie me-2"></i> Dashboard Admin</a>
+                                    @elseif(Auth::user()->role === 'boutique')
+                                        <a class="dropdown-item rounded-xl py-2.5 font-bold text-orange-500 bg-orange-50 mb-1" href="{{ route('boutique.dashboard') }}"><i class="fas fa-store me-2"></i> Ma Boutique</a>
+                                    @endif
+                                </li>
+                                @if(Auth::user()->role === 'client' && !Auth::user()->boutique)
+                                    <li><a class="dropdown-item rounded-xl py-2.5 font-bold text-primary-600" href="{{ route('boutique.register') }}"><i class="fas fa-plus-circle me-2"></i> Devenir Vendeur</a></li>
+                                @endif
+                                <li><a class="dropdown-item rounded-xl py-2.5 text-sm font-medium" href="{{ route('profile.edit') }}"><i class="fas fa-user-edit me-2 opacity-50"></i> Mon Profil</a></li>
+                                <li><a class="dropdown-item rounded-xl py-2.5 text-sm font-medium" href="{{ route('client.commandes') }}"><i class="fas fa-box me-2 opacity-50"></i> Mes Commandes</a></li>
+                                <li><hr class="dropdown-divider opacity-5 my-2"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item rounded-xl py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('login') }}" class="px-6 py-2.5 text-sm font-black text-primary-500 hover:text-primary-600 transition-colors uppercase tracking-widest">Connexion</a>
+                            <a href="{{ route('register') }}" class="px-6 py-2.5 bg-primary-500 text-white text-sm font-black rounded-2xl hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/20 uppercase tracking-widest">S'inscrire</a>
+                        </div>
+                    @endauth
+                    
+                    <!-- Mobile Menu Toggle -->
+                    <button class="p-2.5 bg-slate-100 rounded-2xl text-slate-600 lg:hidden border-0" data-bs-toggle="collapse" data-bs-target="#mobileNav">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Nav (Categories & Links) -->
+        @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
+        <nav class="border-t border-slate-100 hidden lg:block bg-white">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center gap-10">
+                    <div class="dropdown">
+                        <button class="flex items-center gap-3 py-4 text-sm font-black uppercase tracking-[0.1em] text-slate-700 border-0 bg-transparent group" data-bs-toggle="dropdown">
+                            <i class="fas fa-bars text-orange-500"></i> Toutes les catégories
+                        </button>
+                        <ul class="dropdown-menu border-0 shadow-2xl rounded-[1.5rem] p-3 mt-0 w-64 grid grid-cols-1 gap-1">
+                            @if(isset($layoutCategories))
+                                @foreach($layoutCategories as $cat)
+                                    <li>
+                                        <a class="dropdown-item rounded-xl py-2.5 text-sm font-semibold hover:bg-primary-50 hover:text-primary-600 flex items-center justify-between" 
+                                           href="{{ route('shop', ['q' => $cat->libel_categorie]) }}">
+                                            {{ $cat->libel_categorie }}
+                                            <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-30"></i>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
+                        </ul>
+                    </div>
+                    <div class="flex items-center gap-8 h-full">
+                        <a href="{{ url('/') }}" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Accueil</a>
+                        <a href="{{ route('shop') }}" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Boutique</a>
+                        <a href="{{ route('shop') }}" class="text-sm font-bold text-orange-500 hover:text-orange-600 transition-colors py-4 border-b-2 border-transparent hover:border-orange-500">Ventes Flash <i class="fas fa-bolt ms-1"></i></a>
+                        <a href="#" class="text-sm font-bold text-slate-600 hover:text-primary-500 transition-colors py-4 border-b-2 border-transparent hover:border-primary-500">Aide & Support</a>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </nav>
+        @endif
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-main">
-        <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link home-btn" href="{{ url('/') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('shop') }}">Tous nos produits</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-                            Catégories
-                        </a>
-                        <ul class="dropdown-menu">
-                            @if(isset($layoutCategories))
-                                @foreach($layoutCategories as $cat)
-                                    <li><a class="dropdown-item" href="{{ route('shop', ['q' => $cat->libel_categorie]) }}">{{ $cat->libel_categorie }}</a></li>
-                                @endforeach
-                            @else
-                                <li><a class="dropdown-item" href="#">Aucune catégorie</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('shop') }}">Ventes Flash</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@auth{{ route('client.commandes') }}@else#@endauth">Suivi de commande</a>
-                    </li>
-                    @auth
-                        @if(Auth::user()->role === 'client')
-                        <li class="nav-item">
-                            <a class="nav-link position-relative" href="{{ route('client.notifications') }}" id="notificationBell" title="Notifications" style="font-size: 1.2rem;">
-                                <i class="fas fa-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" id="notificationBadge" style="display: none; width: 12px; height: 12px;"></span>
-                            </a>
-                        </li>
-                        @endif
-                    @endauth
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Centre d'aide</a>
-                    </li>
-                    @auth
-                    <li class="nav-item dropdown ms-auto">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> Mon Compte
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                @if(Auth::user()->role === 'admin')
-                                    <a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-pie text-primary"></i> Panneau Admin</a>
-                                @elseif(Auth::user()->role === 'boutique')
-                                    <a class="dropdown-item" href="{{ route('boutique.dashboard') }}"><i class="fas fa-store text-success"></i> Ma Boutique</a>
-                                @else
-                                    <a class="dropdown-item" href="{{ route('dashboard') }}"><i class="fas fa-desktop text-muted"></i> Mon Compte</a>
-                                    @if(!Auth::user()->boutique)
-                                        <a class="dropdown-item fw-bold text-primary" href="{{ route('boutique.register') }}"><i class="fas fa-plus-circle"></i> Ouvrir ma boutique</a>
-                                    @endif
-                                @endif
-                            </li>
-                            @if(Auth::user()->role === 'admin')
-                                <li><a class="dropdown-item" href="{{ route('admin.commandes.index') }}"><i class="fas fa-receipt text-primary"></i> Commandes reçues</a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.users.index') }}"><i class="fas fa-users text-secondary"></i> Gérer les clients</a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.boutiques.index') }}"><i class="fas fa-store text-warning"></i> Gérer les boutiques</a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.produits.index') }}"><i class="fas fa-box text-success"></i> Mon Stock (Admin)</a></li>
-                            @elseif(Auth::user()->role === 'boutique')
-                                <li><a class="dropdown-item" href="{{ route('boutique.commandes.index') }}"><i class="fas fa-receipt text-primary"></i> Commandes reçues</a></li>
-                                <li><a class="dropdown-item" href="{{ route('boutique.produits.index') }}"><i class="fas fa-box text-success"></i> Gérer mes produits</a></li>
-                            @else
-                                {{-- Client uniquement --}}
-                                <li><a class="dropdown-item" href="{{ route('cart.index') }}"><i class="fas fa-shopping-cart text-primary"></i> Mon Panier</a></li>
-                                <li><a class="dropdown-item" href="{{ route('client.commandes') }}"><i class="fas fa-box text-secondary"></i> Mes Commandes</a></li>
-                            @endif
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user text-muted"></i> Mon Profil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                    @endauth
-                </ul>
+        <!-- Mobile Navigation Menu -->
+        <div class="collapse lg:hidden bg-white border-t border-slate-100" id="mobileNav">
+            <div class="p-6 space-y-4">
+                @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
+                <form action="{{ route('shop') }}" method="GET" class="relative">
+                    <input type="text" name="q" placeholder="Rechercher..." class="w-full h-11 bg-slate-100 border-none rounded-xl px-4 text-sm">
+                    <button type="submit" class="absolute right-3 top-2.5 text-slate-400"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="flex flex-col gap-3">
+                    <a href="{{ url('/') }}" class="font-bold text-slate-700 p-3 bg-slate-50 rounded-xl">Accueil</a>
+                    <a href="{{ route('shop') }}" class="font-bold text-slate-700 p-3 hover:bg-slate-50 rounded-xl transition-colors">Boutique</a>
+                    <a href="#" class="font-bold text-orange-500 p-3 hover:bg-orange-50 rounded-xl transition-colors">Ventes Flash</a>
+                </div>
+                @else
+                <div class="p-4 bg-slate-50 rounded-2xl text-center">
+                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Espace Professionnel</p>
+                </div>
+                @endif
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- Main Content -->
     <main>
@@ -390,57 +290,84 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer-main">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <h5>À Propos d'Ondigoci</h5>
-                    <p style="color: rgba(255,255,255,0.8); line-height: 1.6;">
-                        Ondigoci est votre marketplace de confiance pour tous vos achats en ligne. 
-                        Livraison rapide et sécurisée partout en Côte d'Ivoire.
+    <footer class="bg-primary-900 text-white pt-20 pb-10 mt-20 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-primary-500 to-orange-500"></div>
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <!-- Brand -->
+                <div class="space-y-6">
+                    <a href="{{ url('/') }}" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-500 shadow-lg">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <span class="text-2xl font-black tracking-tighter text-white">Ondigoci</span>
+                    </a>
+                    <p class="text-primary-100/60 text-sm leading-relaxed">
+                        Ondigoci est votre marketplace de confiance en Côte d'Ivoire. Nous connectons les vendeurs locaux aux acheteurs exigeants.
                     </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-orange-500 transition-all group">
+                            <i class="fab fa-facebook-f text-sm group-hover:scale-110"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-orange-500 transition-all group">
+                            <i class="fab fa-twitter text-sm group-hover:scale-110"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-orange-500 transition-all group">
+                            <i class="fab fa-instagram text-sm group-hover:scale-110"></i>
+                        </a>
+                    </div>
                 </div>
-                
-                <div class="col-md-3 mb-4">
-                    <h5>Liens Utiles</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#">À propos</a></li>
-                        <li class="mb-2"><a href="#">Conditions d'utilisation</a></li>
-                        <li class="mb-2"><a href="#">Politique de confidentialité</a></li>
-                        <li class="mb-2"><a href="#">Politique de retour</a></li>
-                        <li class="mb-2"><a href="#">FAQ</a></li>
+
+                <!-- Quick Links -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Navigation Rapide</h5>
+                    <ul class="space-y-4">
+                        @if(!auth()->check() || auth()->user()->role === 'client' || request()->has('preview'))
+                        <li><a href="{{ route('shop') }}" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Tous les produits</a></li>
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Ventes Flash</a></li>
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Devenir Vendeur</a></li>
+                        @endif
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Centre d'aide</a></li>
                     </ul>
                 </div>
-                
-                <div class="col-md-3 mb-4">
-                    <h5>Contactez-nous</h5>
-                    <div class="contact-info">
-                        <i class="fas fa-phone"></i>
-                        <span>+225 05 05 05 05 05</span>
-                    </div>
-                    <div class="contact-info">
-                        <i class="fas fa-envelope"></i>
-                        <span>contact@ondigoci.com</span>
-                    </div>
-                    <div class="contact-info">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Abidjan, Côte d'Ivoire</span>
-                    </div>
+
+                <!-- Legal -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Informations Légales</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Politique de confidentialité</a></li>
+                        <li><a href="#" class="text-primary-100/60 hover:text-orange-500 text-sm transition-colors font-medium">Mentions Légales</a></li>
+                    </ul>
                 </div>
-                
-                <div class="col-md-3 mb-4">
-                    <h5>Suivez-nous</h5>
-                    <div class="social-links">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+
+                <!-- Contact -->
+                <div>
+                    <h5 class="text-white font-black uppercase tracking-widest text-xs mb-8">Nous contacter</h5>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 group">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
+                                <i class="fas fa-phone-alt text-sm"></i>
+                            </div>
+                            <p class="text-primary-100/60 text-sm font-medium">+225 05 05 05 05 05</p>
+                        </div>
+                        <div class="flex items-center gap-4 group">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
+                                <i class="fas fa-envelope text-sm"></i>
+                            </div>
+                            <p class="text-primary-100/60 text-sm font-medium">contact@ondigoci.com</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p class="mb-0">&copy; 2026 Ondigoci. Tous droits réservés.</p>
+
+            <div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-primary-100/30 text-xs font-bold uppercase tracking-tighter">&copy; 2026 Ondigoci. Tous droits réservés.</p>
+                <div class="flex gap-6">
+                    <i class="fab fa-cc-visa text-2xl text-primary-100/20 hover:text-primary-100 transition-colors"></i>
+                    <i class="fab fa-cc-mastercard text-2xl text-primary-100/20 hover:text-primary-100 transition-colors"></i>
+                    <i class="fas fa-mobile-alt text-2xl text-primary-100/20 hover:text-primary-100 transition-colors"></i>
+                </div>
             </div>
         </div>
     </footer>
@@ -449,69 +376,174 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Handle search form submission
-        function handleSearch(event) {
-            const searchInput = document.getElementById('searchInput');
-            const query = searchInput.value.trim();
-            
-            if (query === '') {
-                event.preventDefault();
-                alert('Veuillez entrer un terme de recherche');
-                return false;
-            }
-            
-            // Allow form submission with the search query
-            return true;
-        }
+        // Instant Search Logic
+        const searchInput = document.getElementById('instantSearch');
+        const resultsBox = document.getElementById('searchResults');
+        const resultsContent = document.getElementById('resultsContent');
+        const viewAllBtn = document.getElementById('viewAllResults');
+        let searchTimeout;
 
-        // Add event listeners for better UX
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            
-            // Focus and blur effects
-            searchInput.addEventListener('focus', function() {
-                this.style.borderColor = '#ff6b35';
-                this.style.boxShadow = '0 0 8px rgba(255, 107, 53, 0.3)';
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    resultsBox.classList.add('hidden');
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '';
+                                data.forEach(item => {
+                                    html += `
+                                        <a href="${item.url}" class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                                            <div class="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                <img src="${item.image}" class="w-full h-full object-contain p-1">
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-bold text-slate-700 truncate group-hover:text-primary-500">${item.name}</p>
+                                                <p class="text-xs font-black text-primary-500">${item.price}</p>
+                                            </div>
+                                            <i class="fas fa-chevron-right text-[10px] text-slate-300 group-hover:text-primary-500 transition-colors"></i>
+                                        </a>
+                                    `;
+                                });
+                                resultsContent.innerHTML = html;
+                                viewAllBtn.href = `{{ route('shop') }}?q=${encodeURIComponent(query)}`;
+                                resultsBox.classList.remove('hidden');
+                            } else {
+                                resultsContent.innerHTML = '<p class="p-4 text-sm text-slate-400 font-medium text-center">Aucun produit trouvé</p>';
+                                resultsBox.classList.remove('hidden');
+                            }
+                        });
+                }, 300);
             });
-            
-            searchInput.addEventListener('blur', function() {
-                this.style.borderColor = '#e0e0e0';
-                this.style.boxShadow = 'none';
-            });
-            
-            // Auto-submit on Enter key
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('searchForm').submit();
+
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!document.getElementById('searchContainer').contains(e.target)) {
+                    resultsBox.classList.add('hidden');
                 }
             });
+        }
+
+        // Sticky Header Script
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header-sticky');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
         });
 
-        // Charger les notifications automatiquement
-        @auth
-            @if(Auth::user()->role === 'client')
-            function loadNotifications() {
-                fetch('{{ route('client.notifications.data') }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        const badge = document.getElementById('notificationBadge');
-                        if (data.count > 0) {
-                            badge.style.display = 'inline-block';
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    })
-                    .catch(error => console.error('Erreur chargement notifications:', error));
-            }
+        // Universal Toast Notification
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('universal-toast-container');
+            if (!toastContainer) return;
+
+            const toastId = 'toast-' + Date.now();
+            const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-rose-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
             
-            // Charger au démarrage
-            loadNotifications();
+            const toastHtml = `
+                <div id="${toastId}" class="flex items-center gap-4 ${bgColor} text-white px-6 py-4 rounded-2xl shadow-2xl mb-4 animate-bounce-in min-w-[300px]">
+                    <i class="fas ${icon} text-xl"></i>
+                    <div class="flex-1">
+                        <p class="text-sm font-black tracking-tight">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-white/50 hover:text-white transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
             
-            // Rafraîchir toutes les 10 secondes
-            setInterval(loadNotifications, 10000);
-            @endif
-        @endauth
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            setTimeout(() => {
+                const toast = document.getElementById(toastId);
+                if (toast) toast.remove();
+            }, 4000);
+        }
+
+        // Standardized AddToCart
+        function addToCart(productId) {
+            @guest
+                showToast('Veuillez vous connecter pour ajouter au panier', 'error');
+                setTimeout(() => window.location.href = '{{ route("login") }}', 1500);
+                return;
+            @endguest
+
+            fetch('{{ route("cart.add") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ id_produit: productId, quantite: 1 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) {
+                        badge.textContent = data.cartCount;
+                        badge.classList.add('scale-125');
+                        setTimeout(() => badge.classList.remove('scale-125'), 300);
+                    }
+                    showToast('Produit ajouté au panier !');
+                } else {
+                    showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Une erreur est survenue', 'error');
+            });
+        }
+
+        // Notification Badge Update
+        function updateNotificationBadge() {
+            @auth
+                @if(Auth::user()->role === 'client')
+                    fetch('{{ route('client.notifications.data') }}')
+                        .then(response => response.json())
+                        .then(data => {
+                            const badge = document.getElementById('notificationBadge');
+                            if (badge) {
+                                if (data.count > 0) {
+                                    badge.style.display = 'block';
+                                } else {
+                                    badge.style.display = 'none';
+                                }
+                            }
+                        });
+                @endif
+            @endauth
+        }
+
+        document.addEventListener('DOMContentLoaded', updateNotificationBadge);
+        setInterval(updateNotificationBadge, 30000);
     </script>
+
+    <!-- Toast Container -->
+    <div id="universal-toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center"></div>
+
+    <style>
+        @keyframes bounce-in {
+            0% { transform: translateY(-20px) scale(0.9); opacity: 0; }
+            50% { transform: translateY(10px) scale(1.05); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .animate-bounce-in {
+            animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
     
     @yield('scripts')
 </body>

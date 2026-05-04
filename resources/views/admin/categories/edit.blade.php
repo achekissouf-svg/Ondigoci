@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Modifier la Catégorie')
+@section('header_title', 'Modifier la Catégorie')
 
 @section('content')
 <div class="container py-5">
