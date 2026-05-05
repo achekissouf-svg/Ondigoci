@@ -61,26 +61,45 @@
         </div>
     </div>
 
-    <!-- Commandes -->
+    <!-- Total Chiffre d'Affaires -->
     <div class="group p-8 rounded-[2rem] bg-primary-900 text-white shadow-xl shadow-primary-900/20 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden border border-white/5">
         <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
         <div class="relative z-10">
             <div class="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-white mb-6 shadow-lg shadow-orange-500/30">
-                <i class="fas fa-receipt text-2xl"></i>
+                <i class="fas fa-wallet text-2xl"></i>
             </div>
-            <p class="text-[10px] font-black text-primary-200/50 uppercase tracking-[0.2em] mb-2">Commandes</p>
-            <h3 class="text-4xl font-black text-white tracking-tighter">Gérer</h3>
+            <p class="text-[10px] font-black text-primary-200/50 uppercase tracking-[0.2em] mb-2">Chiffre d'Affaires</p>
+            <h3 class="text-3xl font-black text-white tracking-tighter">{{ number_format($stats['total_revenu'], 0, ',', ' ') }} FCFA</h3>
             <div class="mt-6">
                 <a href="{{ route('admin.commandes.index') }}" class="inline-flex items-center gap-2 text-xs font-black text-orange-400 hover:text-orange-300 group-hover:translate-x-1 transition-all uppercase tracking-tighter">
-                    Liste <i class="fas fa-chevron-right text-[10px]"></i>
+                    Historique <i class="fas fa-chevron-right text-[10px]"></i>
                 </a>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Global Analytics Chart -->
+<div class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100 mb-12">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div>
+            <h4 class="text-2xl font-black text-slate-900 tracking-tight">Analyse de Performance</h4>
+            <p class="text-slate-500 font-bold text-sm">Volume d'affaires global sur les 30 derniers jours</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-xl text-primary-600 text-xs font-black uppercase tracking-widest">
+                <i class="fas fa-calendar-alt"></i> 30 Jours
+            </div>
+        </div>
+    </div>
+    <div class="h-[400px] w-full">
+        <canvas id="globalSalesChart"></canvas>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
     <!-- Quick Actions -->
+
     <div class="p-10 rounded-[2.5rem] bg-gradient-to-br from-primary-600 to-primary-900 text-white shadow-2xl relative overflow-hidden border border-white/10">
         <div class="absolute top-0 right-0 p-12 opacity-10 rotate-12">
             <i class="fas fa-bolt text-[10rem]"></i>
@@ -140,4 +159,61 @@
         </div>
     </div>
 </div>
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('globalSalesChart').getContext('2d');
+    const globalSalesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($labels) !!},
+            datasets: [{
+                label: 'Chiffre d\'Affaires Global',
+                data: {!! json_encode($ventesGlobales) !!},
+                backgroundColor: '#1e5a9e',
+                borderRadius: 8,
+                hoverBackgroundColor: '#164e85',
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    padding: 15,
+                    titleFont: { size: 12, weight: 'bold' },
+                    bodyFont: { size: 14 },
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toLocaleString() + ' FCFA';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { display: true, color: 'rgba(0,0,0,0.05)', drawBorder: false },
+                    ticks: {
+                        font: { size: 11, weight: 'bold' },
+                        color: '#64748b',
+                        callback: function(value) {
+                            if (value >= 1000) return (value/1000) + 'k';
+                            return value;
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                }
+            }
+        }
+    });
+</script>
 @endsection
+@endsection
+

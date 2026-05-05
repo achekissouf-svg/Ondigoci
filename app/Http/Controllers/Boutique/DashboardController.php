@@ -47,13 +47,40 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Stats pour le graphique (ventes des 7 derniers jours)
+        $ventesParJour = [];
+        $labels = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $labels[] = now()->subDays($i)->format('d/m');
+            
+            $totalJour = $lignes->filter(function($ligne) use ($date) {
+                return $ligne->created_at->format('Y-m-d') === $date && 
+                       ($ligne->commande->statut_commande ?? '') === 'livree';
+            })->sum(function($ligne) {
+                return $ligne->prix_au_moment_achat * $ligne->quantite_ligne_commande;
+            });
+            
+            $ventesParJour[] = $totalJour;
+        }
+
+        // Unread messages count
+        $unreadChat = \App\Models\Message::where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
         return view('boutique.dashboard', compact(
             'boutique',
             'totalProduits',
             'totalCommandes',
             'commandesEnAttente',
             'chiffreAffaires',
-            'recentesCommandes'
+            'recentesCommandes',
+            'ventesParJour',
+            'labels',
+            'unreadChat'
         ));
+
     }
+
 }

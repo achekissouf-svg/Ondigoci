@@ -36,15 +36,35 @@ class CommandeController extends Controller
     {
         $commande = Commande::findOrFail($id);
         
-        // Potential check: ensure the order contains products from this boutique
-        // For now, keeping it simple as per user request.
-
         $request->validate([
             'statut_commande' => 'required|in:en_attente,en_preparation,en_livraison,livree,rejetee,annulee',
         ]);
 
         $oldStatus = $commande->statut_commande;
         $newStatus = $request->statut_commande;
+
+        // Définition de la hiérarchie des statuts pour empêcher le retour en arrière
+        $statusPriority = [
+            'en_attente' => 1,
+            'en_preparation' => 2,
+            'en_livraison' => 3,
+            'livree' => 4,
+            'rejetee' => 5, // Statut final
+            'annulee' => 5  // Statut final
+        ];
+
+        $oldPriority = $statusPriority[$oldStatus] ?? 0;
+        $newPriority = $statusPriority[$newStatus] ?? 0;
+
+        // Si le statut actuel est final (Livrée, Rejetée, Annulée), on ne change plus rien
+        if ($oldPriority >= 4) {
+            return back()->with('error', 'Cette commande est déjà dans un statut final et ne peut plus être modifiée.');
+        }
+
+        // Empêcher le retour en arrière (sauf pour annulation/rejet qui sont possibles depuis n'importe quel stade non-final)
+        if ($newPriority < $oldPriority && !in_array($newStatus, ['rejetee', 'annulee'])) {
+            return back()->with('error', 'Vous ne pouvez pas revenir à un statut précédent.');
+        }
 
         // Ne créer une notification que si le statut change réellement
         if ($oldStatus !== $newStatus) {
@@ -58,6 +78,7 @@ class CommandeController extends Controller
 
         return back()->with('success', 'Le statut de la commande a été mis à jour.');
     }
+
 
     /**
      * Crée une notification quand le statut change
