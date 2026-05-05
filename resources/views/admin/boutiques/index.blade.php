@@ -60,20 +60,88 @@
                         @endif
                     </td>
                     <td class="px-4 text-center">
-                        @if($boutique->statut === 'en_attente')
-                            <div class="d-flex justify-content-center gap-2">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-sm btn-info text-white rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#docsModal{{ $boutique->id }}">
+                                <i class="fas fa-file-alt me-1"></i> Documents
+                            </button>
+                            
+                            @if($boutique->statut === 'en_attente')
                                 <form action="{{ route('admin.boutiques.approve', $boutique->id) }}" method="POST">
                                     @csrf @method('PATCH')
-                                    <button class="btn btn-sm btn-success shadow-sm rounded-pill px-3"><i class="fas fa-check me-1"></i> Approuver</button>
+                                    <button class="btn btn-sm btn-success shadow-sm rounded-pill px-3"><i class="fas fa-check me-1"></i></button>
                                 </form>
                                 <form action="{{ route('admin.boutiques.reject', $boutique->id) }}" method="POST">
                                     @csrf @method('PATCH')
-                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fas fa-times me-1"></i> Rejeter</button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fas fa-times me-1"></i></button>
                                 </form>
+                            @else
+                                <span class="text-muted small italic">Traité</span>
+                            @endif
+                        </div>
+
+                        <!-- Modal Documents -->
+                        <div class="modal fade" id="docsModal{{ $boutique->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content text-start">
+                                    <div class="modal-header bg-light border-0">
+                                        <h5 class="modal-title fw-bold">Détails de {{ $boutique->nom_boutique }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <p class="mb-1 text-muted small uppercase fw-bold">Responsable</p>
+                                                <p class="fw-bold">{{ $boutique->nom_responsable ?? 'Non renseigné' }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1 text-muted small uppercase fw-bold">Lieu / Ville</p>
+                                                <p class="fw-bold">{{ $boutique->lieu ?? 'Non renseigné' }}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <p class="mb-2 text-muted small uppercase fw-bold">ID Recto</p>
+                                                @if($boutique->piece_identite_recto)
+                                                    <a href="{{ asset('images/' . $boutique->piece_identite_recto) }}" target="_blank">
+                                                        <img src="{{ asset('images/' . $boutique->piece_identite_recto) }}" class="img-fluid rounded border shadow-sm" style="max-height: 150px;">
+                                                    </a>
+                                                @else <span class="badge bg-light text-muted">Manquant</span> @endif
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-2 text-muted small uppercase fw-bold">ID Verso</p>
+                                                @if($boutique->piece_identite_verso)
+                                                    <a href="{{ asset('images/' . $boutique->piece_identite_verso) }}" target="_blank">
+                                                        <img src="{{ asset('images/' . $boutique->piece_identite_verso) }}" class="img-fluid rounded border shadow-sm" style="max-height: 150px;">
+                                                    </a>
+                                                @else <span class="badge bg-light text-muted">Manquant</span> @endif
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-2 text-muted small uppercase fw-bold">Photo Magasin</p>
+                                                @if($boutique->photo_magasin)
+                                                    <a href="{{ asset('images/' . $boutique->photo_magasin) }}" target="_blank">
+                                                        <img src="{{ asset('images/' . $boutique->photo_magasin) }}" class="img-fluid rounded border shadow-sm" style="max-height: 150px;">
+                                                    </a>
+                                                @else <span class="badge bg-light text-muted">Manquant</span> @endif
+                                            </div>
+                                        </div>
+
+                                        @if($boutique->rccm)
+                                        <div class="mt-4 p-3 bg-light rounded d-flex align-items-center">
+                                            <i class="fas fa-file-pdf fs-3 text-danger me-3"></i>
+                                            <div>
+                                                <p class="mb-0 fw-bold">Registre de Commerce (RCCM)</p>
+                                                <a href="{{ asset('images/' . $boutique->rccm) }}" target="_blank" class="small text-decoration-none">Télécharger / Voir le document</a>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                    </div>
+                                </div>
                             </div>
-                        @else
-                            <span class="text-muted small italic">Déjà traité</span>
-                        @endif
+                        </div>
                     </td>
                 </tr>
                 @empty
