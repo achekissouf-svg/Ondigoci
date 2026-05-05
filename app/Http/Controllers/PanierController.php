@@ -58,7 +58,7 @@ class PanierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $paniers = Panier::with('produit.boutique')->where('user_id', auth()->id())->get();
         
@@ -73,10 +73,15 @@ class PanierController extends Controller
             $total += ($prix * $item->quantite);
         }
 
+        if ($request->has('partial')) {
+            return view('cart.partial', compact('paniers', 'total'));
+        }
+
         $modesPaiement = \App\Models\ModePaiement::all();
 
         return view('cart.index', compact('groupedPaniers', 'total', 'modesPaiement'));
     }
+
 
     /**
      * Show the form for creating a new resource.

@@ -22,11 +22,29 @@ class HomeController extends Controller
             ->whereHas('boutique', function($query) {
                 $query->where('statut', 'approuve');
             })
+            ->orderByDesc('est_sponsorise')
+            ->orderByDesc('priorite_sponsoring')
             ->latest()
             ->get();
+
             
         $categories = Categorie::all();
         
         return view('home', compact('featuredProducts', 'categories'));
+    }
+
+    public function helpCenter()
+    {
+        return view('help-center');
+    }
+
+    public function helpSupport()
+    {
+        return view('help-support');
+    }
+
+    public function legal()
+    {
+        return view('legal');
     }
 }
