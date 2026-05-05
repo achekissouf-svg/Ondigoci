@@ -260,7 +260,9 @@
                                         <a class="dropdown-item rounded-xl py-2.5 font-bold text-primary-500 bg-primary-50 mb-1" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-pie me-2"></i> Dashboard Admin</a>
                                     @elseif(Auth::user()->role === 'boutique')
                                         <a class="dropdown-item rounded-xl py-2.5 font-bold text-orange-500 bg-orange-50 mb-1" href="{{ route('boutique.dashboard') }}"><i class="fas fa-store me-2"></i> Ma Boutique</a>
+                                        <a class="dropdown-item rounded-xl py-2.5 font-bold text-emerald-500 bg-emerald-50 mb-1" href="{{ route('boutique.verification.index') }}"><i class="fas fa-user-shield me-2"></i> Vérification</a>
                                     @endif
+
                                 </li>
                                 @if(Auth::user()->role === 'client' && !Auth::user()->boutique)
                                     <li><a class="dropdown-item rounded-xl py-2.5 font-bold text-primary-600" href="{{ route('boutique.register') }}"><i class="fas fa-plus-circle me-2"></i> Devenir Vendeur</a></li>

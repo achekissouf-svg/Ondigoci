@@ -114,14 +114,21 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/avis/produit/{id}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyProduitAvis'])->name('admin.avis.produit.destroy');
     // Monetization
     Route::get('/monetization', [\App\Http\Controllers\Admin\MonetizationController::class, 'index'])->name('admin.monetization.index');
-    Route::get('/monetization/produit/{id}/toggle-sponsoring', [\App\Http\Controllers\Admin\MonetizationController::class, 'toggleSponsoring'])->name('admin.monetization.toggle');
+    Route::patch('/monetization/produit/{id}/toggle-sponsoring', [\App\Http\Controllers\Admin\MonetizationController::class, 'toggleSponsoring'])->name('admin.monetization.toggle');
+
     Route::patch('/monetization/produit/{id}/priority', [\App\Http\Controllers\Admin\MonetizationController::class, 'updatePriority'])->name('admin.monetization.priority');
     
     // Payment Moderation
     Route::get('/monetization/payments', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'index'])->name('admin.monetization.payments');
     Route::patch('/monetization/payments/{id}/validate', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'validatePayment'])->name('admin.monetization.payments.validate');
     Route::patch('/monetization/payments/{id}/reject', [\App\Http\Controllers\Admin\PaymentModerationController::class, 'rejectPayment'])->name('admin.monetization.payments.reject');
+
+    // Boutique Verification Moderation
+    Route::get('/verifications', [\App\Http\Controllers\Admin\VerificationModerationController::class, 'index'])->name('admin.verifications.index');
+    Route::patch('/verifications/{id}/approve', [\App\Http\Controllers\Admin\VerificationModerationController::class, 'approve'])->name('admin.verifications.approve');
+    Route::patch('/verifications/{id}/reject', [\App\Http\Controllers\Admin\VerificationModerationController::class, 'reject'])->name('admin.verifications.reject');
 });
+
 
 
 // Boutique Routes (Vendeurs)
@@ -145,7 +152,12 @@ Route::prefix('boutique')->middleware(['auth', 'boutique'])->group(function () {
     // Manual Payments
     Route::get('/payment/manual', [\App\Http\Controllers\Boutique\ManualPaymentController::class, 'create'])->name('boutique.payment.manual');
     Route::post('/payment/manual', [\App\Http\Controllers\Boutique\ManualPaymentController::class, 'store'])->name('boutique.payment.store');
+
+    // Boutique Verification
+    Route::get('/verification', [\App\Http\Controllers\Boutique\VerificationController::class, 'index'])->name('boutique.verification.index');
+    Route::post('/verification', [\App\Http\Controllers\Boutique\VerificationController::class, 'store'])->name('boutique.verification.store');
 });
+
 
 
 
