@@ -85,6 +85,12 @@
                 <span class="font-bold">Validation Paiements</span>
             </a>
 
+            <a href="{{ route('admin.verifications.index') }}" class="flex items-center gap-3 px-6 py-3.5 rounded-2xl {{ Request::routeIs('admin.verifications.index') ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'text-blue-100 hover:bg-white/10' }} transition-all group">
+                <i class="fas fa-user-shield text-lg group-hover:rotate-12 transition-transform"></i>
+                <span class="font-bold">Vérification Boutiques</span>
+            </a>
+
+
 
             <a href="{{ route('admin.commandes.index') }}" class="flex items-center gap-3 px-5 py-3 rounded-xl {{ Request::routeIs('admin.commandes.*') ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'text-blue-100 hover:bg-white/10' }} transition-all group">
                 <i class="fas fa-receipt w-5 text-center group-hover:rotate-12 transition-transform"></i>
