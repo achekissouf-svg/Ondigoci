@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Boutique extends Model
 {
-    protected $fillable = ['user_id', 'nom_boutique', 'description', 'statut', 'logo', 'adresse_siege', 'whatsapp', 'type_abonnement', 'priorite'];
+    protected $fillable = [
+        'user_id', 'nom_boutique', 'description', 'statut', 'logo', 
+        'adresse_siege', 'whatsapp', 'type_abonnement', 'priorite',
+        'piece_identite', 'justificatif_domicile', 'statut_verification', 'motif_rejet'
+    ];
+
 
     public function user()
     {
